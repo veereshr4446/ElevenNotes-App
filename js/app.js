@@ -31,7 +31,7 @@
     }
 
     // ---------- state ----------
-    const defaultProfile = { name: 'Student', usn: '', bio: '🎓 CSE student at RYMEC. Building the future ✨', avatar: 'images/avatar-girl-1.jpeg' };
+    const defaultProfile = { name: 'Student', usn: '', bio: 'CSE student. Building the future.', avatar: 'images/avatar-boy-1.jpeg' };
     const S = {
         profile: Object.assign({}, defaultProfile, get('profile', {})),
         tasks: get('tasks', []),
@@ -78,6 +78,13 @@
         document.body.classList.add('lock');
         const first = $('#sheetBody input, #sheetBody textarea, #sheetBody select');
         if (first && window.matchMedia('(pointer: fine)').matches) first.focus();
+    }
+    // ---------- anonymous usage count, private (needs supabase/stats.sql) ----------
+    function pingDevice() {
+        if (!libOn()) return;
+        const today = dkey();
+        if (get('pinged', '') === today) return;
+        rpc('ping_device', { p_device: voterId() }).then(() => set('pinged', today)).catch(() => {});
     }
     function openDev() { $('#devWrap').classList.add('open'); $('#devWrap').setAttribute('aria-hidden', 'false'); document.body.classList.add('lock'); }
     function closeDev() { const w = $('#devWrap'); if (!w.classList.contains('open')) return; $('#lofi').pause(); $('#pcard').hidden = true; w.classList.remove('open'); w.setAttribute('aria-hidden', 'true'); document.body.classList.remove('lock'); }
@@ -956,6 +963,7 @@
     setInterval(tickCountdown, 1000);
     setInterval(() => { if (current === 'home') R.home(); }, 60000);
     route();
+    setTimeout(pingDevice, 1500);
     checkProgress();
     if (!get('classAsked', false)) setTimeout(() => { set('classAsked', true); pickerSheet(); }, 500);
 })();
