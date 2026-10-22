@@ -562,3 +562,7 @@ body[data-view="plan"] .fab { display: flex; }
 .install-x { width: 40px; height: 40px; margin-right: 6px; border-radius: 50%; color: var(--ink-2); font-size: 14px; flex: none; }
 /* The music icons keep spinning even with "reduce motion" on, because the spin is the play indicator. */
 .pcard.playing .pcard-ico, .music-btn.playing .i { animation: spinDisc 3s linear infinite !important; }
+
+.lib-filters, .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 12px; }
+.lib-filters label, .two-col label { font-size: 12px; font-weight: 700; color: var(--ink-2); display: block; }
+.lib-filters select, .two-col select { width: 100%; margin-top: 4px; }
