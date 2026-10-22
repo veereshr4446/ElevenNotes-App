@@ -10,7 +10,7 @@ Created by Viresh R. (RYMEC Ballari). The idea, design decisions, timetable data
 - **Class picker:** choose your branch and semester. Subjects, timetable and faculty follow your class. Search (top bar) finds subjects, notes, tasks, tools and classes.
 - **Home:** a "Today" sheet with your classes (current class marked Now, the next one marked Up next), pending tasks, exam countdown and quick links.
 - **Study:** subjects, a day-by-day timetable, and shared notes.
-- **Notes:** upload Google Drive links with a typed subject name, branch and semester. Filter by branch (all CSE sections together) and semester, search them, like the useful ones (most liked first), report bad ones. Each upload gets a 6-digit PIN, and only that PIN can delete it.
+- **Notes:** upload Google Drive links with a typed subject name, branch and semester. Filter by branch (CSE – A, CSE – B, CSE – AI & ML, CSE – Data Science & Cyber, ISE, ECE, EEE, Mechanical, Civil) and semester, search them, like the useful ones (most liked first), report bad ones. Each upload gets a 6-digit PIN, and only that PIN can delete it.
 - **Plan:** tasks with subject, priority and due date.
 - **Tools:** SGPA calculator (VTU grade scale), attendance planner, exam countdown with your own dates, focus timer.
 - **Profile:** name, USN, bio and picture, day streak and stats, today's goals, pending tasks, and a Settings button (class, dark mode, feedback, install, about, reset).
