@@ -262,9 +262,9 @@
     const CFG = window.ELEVEN_CONFIG || {};
     const libOn = () => !!(CFG.supabaseUrl && CFG.supabaseKey);
     const classKey = () => CLS_BRANCH.id + '-' + CLS.sem;
-    // Notes are filtered by branch group (all CSE sections together) and semester.
-    const NOTE_BRANCHES = [{ id: 'CSE', name: 'CSE' }, { id: 'ISE', name: 'ISE' }, { id: 'ECE', name: 'ECE' }, { id: 'EEE', name: 'EEE' }, { id: 'ME', name: 'Mechanical' }, { id: 'CIVIL', name: 'Civil' }];
-    const groupOf = id => (['CSE-A', 'CSE-B', 'AIML-A', 'AIML-B', 'DS'].includes(id) || id === 'CSE') ? 'CSE' : id;
+    // Notes are filtered by branch and semester. CSE A and CSE B are separate; the two AI & ML sections are merged into one.
+    const NOTE_BRANCHES = [{ id: 'CSE-A', name: 'CSE – A' }, { id: 'CSE-B', name: 'CSE – B' }, { id: 'AIML', name: 'CSE – AI & ML' }, { id: 'DS', name: 'CSE – Data Science & Cyber' }, { id: 'ISE', name: 'ISE' }, { id: 'ECE', name: 'ECE' }, { id: 'EEE', name: 'EEE' }, { id: 'ME', name: 'Mechanical' }, { id: 'CIVIL', name: 'Civil' }];
+    const groupOf = id => (id === 'AIML-A' || id === 'AIML-B') ? 'AIML' : id;
     const parseKey = key => { const m = /^(.*)-(\d)$/.exec(key || ''); return m ? { group: groupOf(m[1]), sem: +m[2] } : { group: '', sem: 0 }; };
     const myGroup = () => groupOf(CLS_BRANCH.id);
     const fBranch = () => ui.fBranch == null ? myGroup() : ui.fBranch;
