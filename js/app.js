@@ -31,7 +31,7 @@
     }
 
     // ---------- state ----------
-    const defaultProfile = { name: 'Student', usn: '', bio: '🎓 CSE student at RYMEC. Building the future ✨', avatar: 'images/avatar-girl-1.jpeg' };
+    const defaultProfile = { name: 'Student', usn: '', bio: 'CSE student. Building the future.', avatar: 'images/avatar-boy-1.jpeg' };
     const S = {
         profile: Object.assign({}, defaultProfile, get('profile', {})),
         tasks: get('tasks', []),
@@ -46,7 +46,7 @@
         focusMin: get('focusMin', 25),
         sessions: get('sessions', [])
     };
-    const ui = { lib: { items: [], loaded: false, loading: false, error: false }, libQ: '', studyTab: 'subjects', day: 0, planFilter: 'all', exam: 'last' };
+    const ui = { lib: { items: [], loaded: false, loading: false, error: false }, libQ: '', fBranch: null, fSem: null, studyTab: 'subjects', day: 0, planFilter: 'all', exam: 'last' };
 
     const save = k => set(k, S[k]);
 
@@ -262,6 +262,14 @@
     const CFG = window.ELEVEN_CONFIG || {};
     const libOn = () => !!(CFG.supabaseUrl && CFG.supabaseKey);
     const classKey = () => CLS_BRANCH.id + '-' + CLS.sem;
+    // Notes are filtered by branch group (all CSE sections together) and semester.
+    const NOTE_BRANCHES = [{ id: 'CSE', name: 'CSE' }, { id: 'ISE', name: 'ISE' }, { id: 'ECE', name: 'ECE' }, { id: 'EEE', name: 'EEE' }, { id: 'ME', name: 'Mechanical' }, { id: 'CIVIL', name: 'Civil' }];
+    const groupOf = id => (['CSE-A', 'CSE-B', 'AIML-A', 'AIML-B', 'DS'].includes(id) || id === 'CSE') ? 'CSE' : id;
+    const parseKey = key => { const m = /^(.*)-(\d)$/.exec(key || ''); return m ? { group: groupOf(m[1]), sem: +m[2] } : { group: '', sem: 0 }; };
+    const myGroup = () => groupOf(CLS_BRANCH.id);
+    const fBranch = () => ui.fBranch == null ? myGroup() : ui.fBranch;
+    const fSem = () => ui.fSem == null ? String(CLS.sem) : ui.fSem;
+    const groupName = g => (NOTE_BRANCHES.find(b => b.id === g) || { name: g }).name;
     const DRIVE_RE = /^https:\/\/(drive|docs)\.google\.com\//i;
 
     async function rpc(name, args) {
@@ -287,8 +295,12 @@
         if (current === 'study' && ui.studyTab === 'library') R.study();
         try {
             let items;
-            try { items = await rpc('list_resources', { p_class: classKey(), p_voter: voterId() }); ui.lib.votes = true; }
-            catch (e1) { items = await rpc('list_resources', { p_class: classKey() }); ui.lib.votes = false; }   // upvotes SQL not run yet
+            try { items = await rpc('list_notes', { p_voter: voterId() }); ui.lib.votes = true; }
+            catch (e0) {   // filters SQL not run yet: fall back to this class only
+                try { items = await rpc('list_resources', { p_class: classKey(), p_voter: voterId() }); ui.lib.votes = true; }
+                catch (e1) { items = await rpc('list_resources', { p_class: classKey() }); ui.lib.votes = false; }
+                items = (items || []).map(n => Object.assign({ class_key: classKey() }, n));
+            }
             ui.lib.items = (items || []).map(n => Object.assign({ votes: 0, voted: false }, n))
                 .sort((a, b) => (b.votes - a.votes) || (new Date(b.created_at) - new Date(a.created_at)));
             ui.lib.loaded = true;
@@ -309,18 +321,24 @@
         if (!libOn()) return `<div class="sheet-paper empty"><b>Notes sharing is not switched on yet</b>Once it is, you can share Google Drive links with your class here.</div>${legacy}`;
         const L = ui.lib, q = ui.libQ.trim().toLowerCase();
         const mine = get('mineLib', []), reported = get('reportedLib', []);
+        const fb = fBranch(), fs = fSem();
+        const shownItems = L.items.filter(n => { const k = parseKey(n.class_key); return (fb === 'all' || k.group === fb) && (fs === 'all' || String(k.sem) === fs); });
         let list;
         if (L.loading && !L.items.length) list = `<div class="sheet-paper empty"><b>Loading notes…</b></div>`;
         else if (L.error) list = `<div class="sheet-paper empty"><b>Could not load the notes</b>Check your internet and tap Refresh.</div>`;
-        else if (!L.items.length) list = `<div class="sheet-paper empty"><b>No notes here yet</b>Be the first. Tap “Upload notes” to add a Google Drive link for your class.</div>`;
-        else list = `<div class="flat" id="libList">${L.items.map(n => `
+        else if (!shownItems.length) list = `<div class="sheet-paper empty"><b>No notes here yet</b>${L.items.length ? 'Try another branch or semester above, or' : 'Be the first.'} Tap “Upload notes” to add a Google Drive link.</div>`;
+        else list = `<div class="flat" id="libList">${shownItems.map(n => `
             <div class="note" data-hay="${esc(libItemHay(n))}" ${q && !libItemHay(n).includes(q) ? 'hidden' : ''}>
                 <div class="note-top"><span class="code-chip">${esc(n.subject)}</span><span class="date-sm">${esc(new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }))}</span></div>
-                <h3>${esc(n.title)}</h3><p>Shared by ${esc(n.uploader)}${mine.includes(n.id) ? ' <span class="tag">You</span>' : ''}</p>
+                <h3>${esc(n.title)}</h3><p>Shared by ${esc(n.uploader)} · ${esc(groupName(parseKey(n.class_key).group))}${parseKey(n.class_key).sem ? ' Sem ' + parseKey(n.class_key).sem : ''}${mine.includes(n.id) ? ' <span class="tag">You</span>' : ''}</p>
                 <div class="note-actions">${L.votes ? `<button class="vote ${n.voted ? 'on' : ''}" data-act="lib-vote" data-id="${esc(n.id)}" aria-pressed="${n.voted}" aria-label="Like"><svg class="i" viewBox="0 0 24 24"><path d="M12 20.5s-8.5-5.2-8.5-11A4.6 4.6 0 0 1 12 6.8a4.6 4.6 0 0 1 8.5 2.7c0 5.8-8.5 11-8.5 11z"/></svg><span>${n.votes}</span></button>` : ''}<a class="link-btn" href="${esc(n.url)}" target="_blank" rel="noopener noreferrer">Open link</a><button class="del" data-act="lib-del" data-id="${esc(n.id)}">Delete</button>${reported.includes(n.id) ? '<span class="del off">Reported</span>' : `<button class="del" data-act="lib-report" data-id="${esc(n.id)}">Report</button>`}</div>
             </div>`).join('')}</div><div class="empty" id="libNone" hidden><b>No match</b>Try a different subject or title.</div>`;
         return `<p class="fine" style="margin:0 0 12px">Notes shared by your classmates as Google Drive links. Anyone can upload. Only the person who uploaded can delete, using their 6-digit PIN.</p>
             <div class="lib-actions"><button class="btn primary small" data-act="lib-add">Upload notes</button><button class="btn ghost small" data-act="lib-refresh">${L.loading ? 'Loading…' : 'Refresh'}</button></div>
+            <div class="lib-filters">
+                <label>Branch<select id="libBranch"><option value="all" ${fb === 'all' ? 'selected' : ''}>All branches</option>${NOTE_BRANCHES.map(b => `<option value="${b.id}" ${fb === b.id ? 'selected' : ''}>${b.name}</option>`).join('')}</select></label>
+                <label>Semester<select id="libSem"><option value="all" ${fs === 'all' ? 'selected' : ''}>All semesters</option>${SEMESTERS.map(n => `<option value="${n}" ${fs === String(n) ? 'selected' : ''}>Semester ${n}</option>`).join('')}</select></label>
+            </div>
             ${L.items.length ? `<input class="lib-search" id="libSearch" type="search" placeholder="Search by subject or title" value="${esc(ui.libQ)}" autocomplete="off" aria-label="Search notes" />` : ''}
             ${list}
             <p class="fine">Make sure the Drive link is set to “Anyone with the link can view”. Only Google Drive and Docs links are accepted. Report anything that does not belong here.</p>${legacy}`;
@@ -338,7 +356,12 @@
     }
 
     function libAddSheet(subject) {
+        const ub = fBranch() === 'all' ? myGroup() : fBranch(), us = fSem() === 'all' ? String(CLS.sem) : fSem();
         openSheet('Upload notes', `<form data-form="share">
+            <div class="two-col">
+                <label>Branch<select name="branch">${NOTE_BRANCHES.map(b => `<option value="${b.id}" ${ub === b.id ? 'selected' : ''}>${b.name}</option>`).join('')}</select></label>
+                <label>Semester<select name="sem">${SEMESTERS.map(n => `<option value="${n}" ${us === String(n) ? 'selected' : ''}>Semester ${n}</option>`).join('')}</select></label>
+            </div>
             <label>Subject name<input name="subject" maxlength="20" required value="${esc(subject || '')}" placeholder="e.g. DSA, Maths, Java" autocapitalize="words" /></label>
             <label>Title<input name="title" maxlength="80" required placeholder="e.g. Unit 3 notes" /></label>
             <label>Google Drive link<input type="url" name="url" required placeholder="https://drive.google.com/..." /></label>
@@ -780,9 +803,10 @@
             const btn = f.querySelector('[type=submit]'); btn.disabled = true; btn.textContent = 'Uploading…';
             const d = { title, url, pin, subject: f.subject.value.trim(), uploader: f.uploader.value.trim() || 'Student', date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) };
             try {
-                const id = await rpc('add_resource', { p_class: classKey(), p_title: d.title, p_subject: d.subject, p_url: d.url, p_uploader: d.uploader, p_pin: pin });
+                const id = await rpc('add_resource', { p_class: f.branch.value + '-' + f.sem.value, p_title: d.title, p_subject: d.subject, p_url: d.url, p_uploader: d.uploader, p_pin: pin });
                 const mine = get('mineLib', []); mine.push(id); set('mineLib', mine.slice(-100));
                 ui.lib.loaded = false; ui.lib.items = [];
+                ui.fBranch = f.branch.value; ui.fSem = f.sem.value;
                 bump('notesAdded', 1, 'added');
                 closeSheet(); receiptSheet(d); loadLibrary();
             } catch (e) { btn.disabled = false; btn.textContent = 'Upload'; formError(f, 'Could not upload. Check your internet connection and try again.'); }
@@ -948,6 +972,10 @@
         if (el.id === 'libSearch') { filterLib(el.value); return; }
         if (el.closest('#sgpaRows')) { sgpaRows()[+el.dataset.i][el.dataset.f] = el.value; save('sgpa'); calcSgpa(true); }
         if (el.closest('#tool-att')) calcWhatIf(true);
+    });
+    document.addEventListener('change', e => {
+        if (e.target.id === 'libBranch') { ui.fBranch = e.target.value; renderCurrent(); }
+        else if (e.target.id === 'libSem') { ui.fSem = e.target.value; renderCurrent(); }
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSheet(); closeDev(); } });
     window.addEventListener('hashchange', () => { if (location.hash !== routedHash) route(); });
