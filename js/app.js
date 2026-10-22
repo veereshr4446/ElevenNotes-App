@@ -331,7 +331,7 @@
             <div class="note" data-hay="${esc(libItemHay(n))}" ${q && !libItemHay(n).includes(q) ? 'hidden' : ''}>
                 <div class="note-top"><span class="code-chip">${esc(n.subject)}</span><span class="date-sm">${esc(new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }))}</span></div>
                 <h3>${esc(n.title)}</h3><p>Shared by ${esc(n.uploader)} · ${esc(groupName(parseKey(n.class_key).group))}${parseKey(n.class_key).sem ? ' Sem ' + parseKey(n.class_key).sem : ''}${mine.includes(n.id) ? ' <span class="tag">You</span>' : ''}</p>
-                <div class="note-actions">${L.votes ? `<button class="vote ${n.voted ? 'on' : ''}" data-act="lib-vote" data-id="${esc(n.id)}" aria-pressed="${n.voted}" aria-label="Like"><svg class="i" viewBox="0 0 24 24"><path d="M12 20.5s-8.5-5.2-8.5-11A4.6 4.6 0 0 1 12 6.8a4.6 4.6 0 0 1 8.5 2.7c0 5.8-8.5 11-8.5 11z"/></svg><span>${n.votes}</span></button>` : ''}<a class="link-btn" href="${esc(n.url)}" target="_blank" rel="noopener noreferrer">Open link</a><button class="del" data-act="lib-del" data-id="${esc(n.id)}">Delete</button>${reported.includes(n.id) ? '<span class="del off">Reported</span>' : `<button class="del" data-act="lib-report" data-id="${esc(n.id)}">Report</button>`}</div>
+                <div class="note-actions">${L.votes ? `<button class="vote ${n.voted ? 'on' : ''}" data-act="lib-vote" data-id="${esc(n.id)}" aria-pressed="${n.voted}" aria-label="Like"><svg class="i" viewBox="0 0 24 24"><path d="M12 20.5s-8.5-5.2-8.5-11A4.6 4.6 0 0 1 12 6.8a4.6 4.6 0 0 1 8.5 2.7c0 5.8-8.5 11-8.5 11z"/></svg><span>${n.votes}</span></button>` : ''}<a class="link-btn" href="${esc(n.url)}" target="_blank" rel="noopener noreferrer">Open link</a><button class="dots" data-act="lib-menu" data-id="${esc(n.id)}" aria-label="More options"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></div>
             </div>`).join('')}</div><div class="empty" id="libNone" hidden><b>No match</b>Try a different subject or title.</div>`;
         return `<p class="fine" style="margin:0 0 12px">Notes shared by your classmates as Google Drive links. Anyone can upload. Only the person who uploaded can delete, using their 6-digit PIN.</p>
             <div class="lib-actions"><button class="btn primary small" data-act="lib-add">Upload notes</button><button class="btn ghost small" data-act="lib-refresh">${L.loading ? 'Loading…' : 'Refresh'}</button></div>
@@ -879,6 +879,32 @@
         'lib-add'() { libAddSheet(); },
         'lib-refresh'() { ui.lib.loaded = false; loadLibrary(); },
         'lib-del'(t) { libDelSheet(t.dataset.id); },
+        'lib-menu'(t) {
+            const n = ui.lib.items.find(x => x.id === t.dataset.id); if (!n) return;
+            const rep = get('reportedLib', []).includes(n.id);
+            openSheet(n.title, `<div class="flat menu-list">
+                <button data-act="lib-share" data-id="${esc(n.id)}"><span class="em">🔗</span><span class="grow"><b>Share</b><span>Send this link to a friend</span></span></button>
+                <button data-act="lib-del" data-id="${esc(n.id)}"><span class="em">🗑️</span><span class="grow"><b>Delete</b><span>Needs your 6-digit PIN</span></span></button>
+                ${rep ? '<div class="menu-off"><span class="em">🚩</span><span class="grow"><b>Reported</b><span>Thanks, we will review it</span></span></div>' : `<button data-act="lib-report" data-id="${esc(n.id)}"><span class="em">🚩</span><span class="grow"><b>Report</b><span>Spam or not suitable</span></span></button>`}
+            </div>`);
+        },
+        async 'lib-share'(t) {
+            closeSheet();
+            const n = ui.lib.items.find(x => x.id === t.dataset.id); if (!n) return;
+            const site = location.origin + location.pathname.replace(/index\.html$/, '');
+            const text = `${n.title} (${n.subject})\n${n.url}\n\nShared on ElevenNotes: ${site}`;
+            if (navigator.share) {
+                try { await navigator.share({ title: n.title, text }); return; }
+                catch (e) { if (e && e.name === 'AbortError') return; }
+            }
+            let ok = false;
+            try { await navigator.clipboard.writeText(text); ok = true; }
+            catch (e) {
+                const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select();
+                try { ok = document.execCommand('copy'); } catch (e2) { ok = false; } ta.remove();
+            }
+            toast(ok ? 'Link copied. Paste it in any chat.' : 'Could not copy the link.', ok ? '' : 'err');
+        },
         'lib-vote'(t) {
             const n = ui.lib.items.find(x => x.id === t.dataset.id); if (!n) return;
             n.voted = !n.voted; n.votes += n.voted ? 1 : -1; renderCurrent();
@@ -888,6 +914,7 @@
             });
         },
         'lib-report'(t) {
+            closeSheet();
             const rep = get('reportedLib', []);
             if (rep.includes(t.dataset.id)) return;
             if (!confirm('Report this link as spam or not suitable?')) return;
