@@ -576,3 +576,10 @@ body[data-view="plan"] .fab { display: flex; }
 .dots .i { width: 22px; height: 22px; fill: currentColor; stroke: none; }
 .dots:active { background: var(--brand-soft); }
 .menu-off { display: flex; align-items: center; gap: 12px; padding: 12px 14px; opacity: .6; }
+.install-main .install-title { display: block; }
+.install-main .install-sub { display: block; }
+.install-main .install-size {
+  display: inline;
+  font-weight: 800;
+  color: #3f3fb5;
+}
