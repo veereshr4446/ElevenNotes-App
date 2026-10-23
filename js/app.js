@@ -197,7 +197,7 @@
         $('#page-home').innerHTML = `
             <h1 class="hello">${greet}${named ? ', ' + esc(first) : ''}<small>${named ? 'Here is your day.' : 'Add your name in the Me tab to personalise this.'}</small></h1>
             <button class="class-pill" data-act="pick-class" aria-label="Change class">🎓 ${esc(clsLabel())} <span>Change</span></button>
-            ${(isStandalone() || get('installDismiss', false)) ? '' : `<div class="install-card"><button class="install-main" data-act="install"><span class="install-ico">📲</span><span class="grow"><b>Install ElevenNotes</b><span>Only 0.6 MB. Add it to your home screen</span></span></button><button class="install-x" data-act="install-dismiss" aria-label="Hide">✕</button></div>`}
+            ${(isStandalone() || get('installDismiss', false)) ? '' : `<div class="install-card"><button class="install-main" data-act="install"><span class="install-ico">📲</span><span class="grow"><b>Install ElevenNotes App</b><span>Only 0.6 MB. Add it to your home screen</span></span></button><button class="install-x" data-act="install-dismiss" aria-label="Hide">✕</button></div>`}
             <div class="today">
                 <div class="today-top">
                     <div class="date-big"><b>${now.getDate()}</b><span>${now.toLocaleDateString('en-IN', { weekday: 'short' })}<br>${now.toLocaleDateString('en-IN', { month: 'short' })}</span></div>
