@@ -581,5 +581,5 @@ body[data-view="plan"] .fab { display: flex; }
 .install-main .install-size {
   display: inline;
   font-weight: 800;
-  color: #17123f;
+  color: var(--ink);
 }
