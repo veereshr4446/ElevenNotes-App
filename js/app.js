@@ -31,7 +31,7 @@
     }
 
     // ---------- state ----------
-    const defaultProfile = { name: 'Student', usn: '', bio: 'CSE student✨. Building the future🚀.', avatar: 'images/avatar-girl-1.jpeg' };
+    const defaultProfile = { name: 'Student', usn: '', bio: 'CSE student. Building the future.', avatar: 'images/avatar-girl-1.jpeg' };
     const S = {
         profile: Object.assign({}, defaultProfile, get('profile', {})),
         tasks: get('tasks', []),
