@@ -26,7 +26,12 @@ language sql security definer set search_path = public as $$
         'active_week', (select count(*) from public.app_devices where last_seen > now() - interval '7 days'),
         'notes',       (select count(*) from public.resources where reports < 5),
         'likes',       (select count(*) from public.resource_votes),
-        'classes',     (select count(distinct class_key) from public.resources where reports < 5)
+        'classes',     (select count(distinct class_key) from public.resources where reports < 5),
+        'returning',   (select count(*) from public.app_devices where last_seen::date > first_seen::date),
+        'new_week',    (select count(*) from public.app_devices where first_seen > now() - interval '7 days'),
+        'notes_week',  (select count(*) from public.resources where reports < 5 and created_at > now() - interval '7 days'),
+        'hidden_notes',(select count(*) from public.resources where reports >= 5),
+        'top_class',   (select class_key from public.resources where reports < 5 group by class_key order by count(*) desc limit 1)
     );
 $$;
 
