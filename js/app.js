@@ -508,9 +508,9 @@
     if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) navigator.serviceWorker.register('sw.js').catch(() => {});
     function installApp() {
         if (installEvt) { const e = installEvt; installEvt = null; e.prompt(); return; }
-        const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         openSheet('Add to home screen', `<ol class="steps">${ios
-            ? '<li>Tap the <b>Share</b> button in Safari.</li><li>Choose <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>. ElevenNotes opens like an app.</li>'
+            ? '<li>Tap the <b>Share</b> button (a square with an arrow). In Safari it is at the bottom, in Chrome it is next to the address bar.</li><li>Scroll down and choose <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>. ElevenNotes opens like an app.</li>'
             : '<li>Tap the <b>⋮ menu</b> in your browser.</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b>.</li><li>Tap <b>Install</b>. ElevenNotes opens like an app.</li>'}</ol>
             <p class="fine">It opens full screen, loads fast and still works without internet for your timetable and tasks.</p>`);
     }
