@@ -267,8 +267,8 @@
     const groupOf = id => (id === 'AIML-A' || id === 'AIML-B') ? 'AIML' : id;
     const parseKey = key => { const m = /^(.*)-(\d)$/.exec(key || ''); return m ? { group: groupOf(m[1]), sem: +m[2] } : { group: '', sem: 0 }; };
     const myGroup = () => groupOf(CLS_BRANCH.id);
-    const fBranch = () => ui.fBranch == null ? myGroup() : ui.fBranch;
-    const fSem = () => ui.fSem == null ? String(CLS.sem) : ui.fSem;
+    const fBranch = () => ui.fBranch == null ? 'all' : ui.fBranch;
+    const fSem = () => ui.fSem == null ? 'all' : ui.fSem;
     const groupName = g => (NOTE_BRANCHES.find(b => b.id === g) || { name: g }).name;
     const DRIVE_RE = /^https:\/\/(drive|docs)\.google\.com\//i;
 
