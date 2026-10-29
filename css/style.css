@@ -577,4 +577,4 @@ body[data-view="plan"] .fab { display: flex; }
 .dots:active { background: var(--brand-soft); }
 .menu-off { display: flex; align-items: center; gap: 12px; padding: 12px 14px; opacity: .6; }
 
-.dev-card .dev-edu { color: var(--ink); font-weight: 600; font-size: 14px; margin: 0 0 16px; }
+.dev-card .dev-edu { color: var(--ink); font-weight: 600; font-size: 14px; margin: 0 0 8px; }
