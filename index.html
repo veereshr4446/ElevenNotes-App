@@ -21,9 +21,7 @@
         (function () {
             var t = null;
             try { t = JSON.parse(localStorage.getItem('elevenNotes_theme')); } catch (e) {}
-            if (t !== 'dark' && t !== 'light') {
-                t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-            }
+            if (t !== 'dark' && t !== 'light') t = 'light';   // first visit is always light
             document.documentElement.setAttribute('data-theme', t);
         })();
     </script>
