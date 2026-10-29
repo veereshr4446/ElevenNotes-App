@@ -31,7 +31,7 @@
     }
 
     // ---------- state ----------
-    const defaultProfile = { name: 'Student', usn: '', bio: 'CSE student. Building the future.', avatar: 'images/avatar-girl-1.jpeg' };
+    const defaultProfile = { name: 'Student', usn: '', bio: 'CSE student. Building the future.', avatar: 'images/avatar-boy-1.jpeg' };
     const S = {
         profile: Object.assign({}, defaultProfile, get('profile', {})),
         tasks: get('tasks', []),
@@ -197,7 +197,7 @@
         $('#page-home').innerHTML = `
             <h1 class="hello">${greet}${named ? ', ' + esc(first) : ''}<small>${named ? 'Here is your day.' : 'Add your name in the Me tab to personalise this.'}</small></h1>
             <button class="class-pill" data-act="pick-class" aria-label="Change class">🎓 ${esc(clsLabel())} <span>Change</span></button>
-            ${(isStandalone() || get('installDismiss', false)) ? '' : `<div class="install-card"><button class="install-main" data-act="install"><span class="install-ico">📲</span><span class="grow"><b class="install-title">Install ElevenNotes App</b><span class="install-sub"><b class="install-size">0.6 MB</b> only · Add it to your home screen</span></span></button><button class="install-x" data-act="install-dismiss" aria-label="Hide">✕</button></div>`}
+            ${(isStandalone() || get('installDismiss', false)) ? '' : `<div class="install-card"><button class="install-main" data-act="install"><span class="install-ico">📲</span><span class="grow"><b>Install ElevenNotes</b><span>Only 0.6 MB. Add it to your home screen</span></span></button><button class="install-x" data-act="install-dismiss" aria-label="Hide">✕</button></div>`}
             <div class="today">
                 <div class="today-top">
                     <div class="date-big"><b>${now.getDate()}</b><span>${now.toLocaleDateString('en-IN', { weekday: 'short' })}<br>${now.toLocaleDateString('en-IN', { month: 'short' })}</span></div>
@@ -403,7 +403,7 @@
         const it = ui.lib.items.find(i => i.id === id); if (!it) return;
         openSheet('Delete this link', `<form data-form="unshare"><input type="hidden" name="id" value="${esc(id)}" />
             <p><b>${esc(it.title)}</b></p>
-            <label>Enter the 6-digit PIN you got when you shared it<input name="pin" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" minlength="6" required placeholder="------" autocomplete="off" /></label>
+            <label>Enter the 6-digit PIN you got when you shared it<input type="password" name="pin" maxlength="64" required placeholder="------" autocomplete="off" /></label>
             <button class="btn danger block" type="submit">Delete</button></form>`);
     }
 
@@ -813,7 +813,7 @@
         },
         async unshare(f) {
             const id = f.id.value, pin = f.pin.value.trim();
-            if (!/^[0-9]{6}$/.test(pin)) { formError(f, 'The PIN must be exactly 6 digits.'); return; }
+            if (!/^[0-9]{6}$/.test(pin) && pin.length < 8) { formError(f, 'The PIN must be exactly 6 digits.'); return; }
             const btn = f.querySelector('[type=submit]'); btn.disabled = true;
             try {
                 const r = await rpc('delete_resource', { p_id: id, p_pin: pin });
