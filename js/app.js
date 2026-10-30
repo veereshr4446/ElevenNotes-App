@@ -18,6 +18,7 @@
     const dkey = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     // ---------- the student's class (branch + semester) ----------
     const CLS = get('class', null) || DEFAULT_CLASS;
+    if (CLS.branch === 'ECE') CLS.branch = 'ECE-A';   // ECE was split into sections A and B
     const CLS_BRANCH = BRANCHES.find(b => b.id === CLS.branch) || BRANCHES[0];
     const CD = CLASS_DATA[CLS_BRANCH.id + '|' + CLS.sem] || null;
     if (CD) { SUBJECTS = CD.subjects; FACULTY = CD.faculty; TIMETABLE = CD.timetable; EXAMS = CD.exams; }
@@ -263,8 +264,8 @@
     const libOn = () => !!(CFG.supabaseUrl && CFG.supabaseKey);
     const classKey = () => CLS_BRANCH.id + '-' + CLS.sem;
     // Notes are filtered by branch and semester. CSE A and CSE B are separate; the two AI & ML sections are merged into one.
-    const NOTE_BRANCHES = [{ id: 'CSE-A', name: 'CSE – A' }, { id: 'CSE-B', name: 'CSE – B' }, { id: 'AIML', name: 'CSE – AI & ML' }, { id: 'DS', name: 'CSE – Data Science & Cyber' }, { id: 'ISE', name: 'ISE' }, { id: 'ECE', name: 'ECE' }, { id: 'EEE', name: 'EEE' }, { id: 'ME', name: 'Mechanical' }, { id: 'CIVIL', name: 'Civil' }];
-    const groupOf = id => (id === 'AIML-A' || id === 'AIML-B') ? 'AIML' : id;
+    const NOTE_BRANCHES = [{ id: 'CSE-A', name: 'CSE – A' }, { id: 'CSE-B', name: 'CSE – B' }, { id: 'CSE-C', name: 'CSE – C' }, { id: 'AIML', name: 'CSE – AI & ML' }, { id: 'DS', name: 'CSE – Data Science & Cyber' }, { id: 'ISE', name: 'ISE' }, { id: 'ECE-A', name: 'ECE – A' }, { id: 'ECE-B', name: 'ECE – B' }, { id: 'EEE', name: 'EEE' }, { id: 'ME', name: 'Mechanical' }, { id: 'CIVIL', name: 'Civil' }];
+    const groupOf = id => (id === 'AIML-A' || id === 'AIML-B') ? 'AIML' : id === 'ECE' ? 'ECE-A' : id;
     const parseKey = key => { const m = /^(.*)-(\d)$/.exec(key || ''); return m ? { group: groupOf(m[1]), sem: +m[2] } : { group: '', sem: 0 }; };
     const myGroup = () => groupOf(CLS_BRANCH.id);
     const fBranch = () => ui.fBranch == null ? 'all' : ui.fBranch;
