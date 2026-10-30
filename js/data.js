@@ -10,11 +10,13 @@
 const BRANCHES = [
     { id: 'CSE-A', name: 'CSE – A',        long: 'Computer Science & Engineering, Section A', emoji: '💻' },
     { id: 'CSE-B', name: 'CSE – B',        long: 'Computer Science & Engineering, Section B', emoji: '💻' },
+    { id: 'CSE-C', name: 'CSE – C',        long: 'Computer Science & Engineering, Section C', emoji: '💻' },
     { id: 'AIML-A', name: 'CSE – AI & ML – A', long: 'CSE (Artificial Intelligence & Machine Learning), Section A', emoji: '🤖' },
     { id: 'AIML-B', name: 'CSE – AI & ML – B', long: 'CSE (Artificial Intelligence & Machine Learning), Section B', emoji: '🤖' },
     { id: 'DS',    name: 'CSE – Data Science & Cyber', long: 'CSE (Data Science) and CSE (Cyber Security)', emoji: '📊' },
     { id: 'ISE',   name: 'ISE',            long: 'Information Science & Engineering', emoji: '🧩' },
-    { id: 'ECE',   name: 'ECE',            long: 'Electronics & Communication Engineering', emoji: '📡' },
+    { id: 'ECE-A', name: 'ECE – A',        long: 'Electronics & Communication Engineering, Section A', emoji: '📡' },
+    { id: 'ECE-B', name: 'ECE – B',        long: 'Electronics & Communication Engineering, Section B', emoji: '📡' },
     { id: 'EEE',   name: 'EEE',            long: 'Electrical & Electronics Engineering', emoji: '⚡' },
     { id: 'ME',    name: 'Mechanical',     long: 'Mechanical Engineering', emoji: '⚙️' },
     { id: 'CIVIL', name: 'Civil',          long: 'Civil Engineering', emoji: '🏗️' }
@@ -610,6 +612,362 @@ const SEM1 = {
     }
 };
 
+// Third year (Semester 5) CSE sections A, B and C. Timetable and subject staff only.
+const SEM5 = {
+    A: {
+        note: "CSE section A, Semester 5, LH-10. Break 10:50 to 11:00, lunch 12:50 to 2:15. Web Technology Lab batches: A1 is roll numbers 01 to 28, A2 is 29 to 57. Mini project batches: A1 to A20.",
+        subjects: [
+            {"id": "SE", "code": "BCS501", "name": "Software Engineering & Project Management", "faculty": "Dr. Lakshmi Vasudeva", "kind": "theory", "credits": 0},
+            {"id": "CN", "code": "BCS502", "name": "Computer Networks", "faculty": "Prof. Sharmila G K", "kind": "theory", "credits": 0},
+            {"id": "TOC", "code": "BCS503", "name": "Theory of Computation", "faculty": "Dr. Nagaveni Biradar", "kind": "theory", "credits": 0},
+            {"id": "WTL", "code": "BCSL504", "name": "Web Technology Lab", "faculty": "Prof. Sharmila G K", "kind": "lab", "credits": 0},
+            {"id": "USP", "code": "BCS515C", "name": "Unix System Programming", "faculty": "Prof. Rajeswari R P / Prof. Naga Ashwini Nayak V J", "kind": "theory", "credits": 0},
+            {"id": "MP", "code": "BCS586", "name": "Mini Project", "faculty": "Dr. Girisha H", "kind": "project", "credits": 0},
+            {"id": "RMIPR", "code": "BRMK557", "name": "Research Methodology and IPR", "faculty": "Dr. Lakshmi Vasudeva", "kind": "theory", "credits": 0},
+            {"id": "EVS", "code": "BCS508", "name": "Environmental Studies and E-waste Management", "faculty": "Mrs. Raja Selvi", "kind": "theory", "credits": 0}
+        ],
+        faculty: [
+            {"name": "Dr. Lakshmi Vasudeva", "subject": "Software Engineering & Project Management", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Prof. Sharmila G K", "subject": "Computer Networks", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Dr. Nagaveni Biradar", "subject": "Theory of Computation", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Prof. Sharmila G K", "subject": "Web Technology Lab", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Prof. Rajeswari R P", "subject": "Unix System Programming", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Prof. Naga Ashwini Nayak V J", "subject": "Unix System Programming", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Dr. Girisha H", "subject": "Mini Project", "dept": "CSE", "emoji": "👨‍🏫"},
+            {"name": "Dr. Lakshmi Vasudeva", "subject": "Research Methodology and IPR", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Mrs. Raja Selvi", "subject": "Environmental Studies and E-waste Management", "dept": "CSE", "emoji": "👩‍🏫"}
+        ],
+        timetable: {
+            1: [
+                {t: 540, n: 1, sub: "TOC"},
+                {t: 595, n: 1, sub: "CN"},
+                {t: 660, n: 1, sub: "SE"},
+                {t: 715, n: 1, sub: "RMIPR"},
+                {t: 855, n: 3, title: "Web Technology Lab", detail: "Batch A1 (roll numbers 01 to 28) has this lab today. The other batch has it on another day.", kind: "lab"}
+            ],
+            2: [
+                {t: 540, n: 1, sub: "RMIPR"},
+                {t: 595, n: 1, sub: "EVS"},
+                {t: 660, n: 1, sub: "TOC"},
+                {t: 715, n: 1, sub: "USP"},
+                {t: 855, n: 3, title: "Web Technology Lab", detail: "Batch A2 (roll numbers 29 to 57) has this lab today. The other batch has it on another day.", kind: "lab"}
+            ],
+            3: [
+                {t: 540, n: 1, sub: "USP"},
+                {t: 595, n: 1, sub: "TOC"},
+                {t: 660, n: 1, sub: "CN"},
+                {t: 715, n: 1, sub: "SE"},
+                {t: 855, n: 1, sub: "RMIPR"},
+                {t: 910, n: 2, title: "Computer Networks Lab", detail: "Whole class. CN laboratory sessions", kind: "lab"}
+            ],
+            4: [
+                {t: 540, n: 1, sub: "SE"},
+                {t: 595, n: 1, sub: "TOC"},
+                {t: 660, n: 1, sub: "USP"},
+                {t: 715, n: 1, sub: "CN"},
+                {t: 855, n: 3, sub: "MP"}
+            ],
+            5: [
+                {t: 540, n: 1, sub: "CN"},
+                {t: 595, n: 1, sub: "USP"},
+                {t: 660, n: 1, sub: "SE"},
+                {t: 715, n: 1, sub: "TOC"},
+                {t: 855, n: 3, sub: "MP"}
+            ],
+            6: [
+                {t: 540, n: 1, sub: "EVS"},
+                {t: 595, n: 1, sub: "CN"},
+                {t: 660, n: 1, sub: "USP"},
+                {t: 715, n: 1, sub: "SE"}
+            ]
+        },
+        exams: []
+    },
+    B: {
+        note: "CSE section B, Semester 5, LH-11. Break 10:50 to 11:00, lunch 12:50 to 2:15. Web Technology Lab batches: B1 is roll numbers 01 to 28, B2 is 29 to 56. Mini project batches: B1 to B20.",
+        subjects: [
+            {"id": "SE", "code": "BCS501", "name": "Software Engineering & Project Management", "faculty": "Dr. Lakshmi Vasudeva", "kind": "theory", "credits": 0},
+            {"id": "CN", "code": "BCS502", "name": "Computer Networks", "faculty": "Ms. Nithya Santhoshi H", "kind": "theory", "credits": 0},
+            {"id": "TOC", "code": "BCS503", "name": "Theory of Computation", "faculty": "Prof. Sunitha S", "kind": "theory", "credits": 0},
+            {"id": "WTL", "code": "BCSL504", "name": "Web Technology Lab", "faculty": "Prof. Bilwashree H", "kind": "lab", "credits": 0},
+            {"id": "USP", "code": "BCS515C", "name": "Unix System Programming", "faculty": "Dr. Puneeth G J", "kind": "theory", "credits": 0},
+            {"id": "MP", "code": "BCS586", "name": "Mini Project", "faculty": "Dr. Girisha H", "kind": "project", "credits": 0},
+            {"id": "RMIPR", "code": "BRMK557", "name": "Research Methodology and IPR", "faculty": "Prof. Suresh K", "kind": "theory", "credits": 0},
+            {"id": "EVS", "code": "BCS508", "name": "Environmental Studies and E-waste Management", "faculty": "Mr. Ganesh", "kind": "theory", "credits": 0}
+        ],
+        faculty: [
+            {"name": "Dr. Lakshmi Vasudeva", "subject": "Software Engineering & Project Management", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Ms. Nithya Santhoshi H", "subject": "Computer Networks", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Prof. Sunitha S", "subject": "Theory of Computation", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Prof. Bilwashree H", "subject": "Web Technology Lab", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Dr. Puneeth G J", "subject": "Unix System Programming", "dept": "CSE", "emoji": "👨‍🏫"},
+            {"name": "Dr. Girisha H", "subject": "Mini Project", "dept": "CSE", "emoji": "👨‍🏫"},
+            {"name": "Prof. Suresh K", "subject": "Research Methodology and IPR", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Mr. Ganesh", "subject": "Environmental Studies and E-waste Management", "dept": "CSE", "emoji": "👨‍🏫"}
+        ],
+        timetable: {
+            1: [
+                {t: 540, n: 1, sub: "TOC"},
+                {t: 595, n: 1, sub: "EVS"},
+                {t: 660, n: 1, sub: "CN"},
+                {t: 715, n: 1, sub: "USP"},
+                {t: 855, n: 1, sub: "RMIPR"},
+                {t: 910, n: 2, title: "Computer Networks Lab", detail: "Whole class. CN laboratory sessions", kind: "lab"}
+            ],
+            2: [
+                {t: 540, n: 1, sub: "RMIPR"},
+                {t: 595, n: 1, sub: "TOC"},
+                {t: 660, n: 1, sub: "USP"},
+                {t: 715, n: 1, sub: "SE"},
+                {t: 855, n: 3, sub: "MP"}
+            ],
+            3: [
+                {t: 540, n: 1, sub: "SE"},
+                {t: 595, n: 1, sub: "USP"},
+                {t: 660, n: 1, sub: "CN"},
+                {t: 715, n: 1, sub: "TOC"},
+                {t: 855, n: 3, title: "Web Technology Lab", detail: "Batch B1 (roll numbers 01 to 28) has this lab today. The other batch has it on another day.", kind: "lab"}
+            ],
+            4: [
+                {t: 540, n: 1, sub: "TOC"},
+                {t: 595, n: 1, sub: "CN"},
+                {t: 660, n: 1, sub: "SE"},
+                {t: 715, n: 1, sub: "USP"},
+                {t: 855, n: 3, sub: "MP"}
+            ],
+            5: [
+                {t: 540, n: 1, sub: "CN"},
+                {t: 595, n: 1, sub: "SE"},
+                {t: 660, n: 1, sub: "TOC"},
+                {t: 715, n: 1, sub: "EVS"},
+                {t: 855, n: 3, title: "Web Technology Lab", detail: "Batch B2 (roll numbers 29 to 56) has this lab today. The other batch has it on another day.", kind: "lab"}
+            ],
+            6: [
+                {t: 540, n: 1, sub: "CN"},
+                {t: 595, n: 1, sub: "SE"},
+                {t: 660, n: 1, sub: "USP"},
+                {t: 715, n: 1, sub: "RMIPR"}
+            ]
+        },
+        exams: []
+    },
+    C: {
+        note: "CSE section C, Semester 5, LH-12. Break 10:50 to 11:00, lunch 12:50 to 2:15. Web Technology Lab batches: C1 is roll numbers 01 to 28, C2 is 29 to 59. Mini project batches: C1 to C15.",
+        subjects: [
+            {"id": "SE", "code": "BCS501", "name": "Software Engineering & Project Management", "faculty": "Prof. Suresh K", "kind": "theory", "credits": 0},
+            {"id": "CN", "code": "BCS502", "name": "Computer Networks", "faculty": "Dr. Prabhavathi S", "kind": "theory", "credits": 0},
+            {"id": "TOC", "code": "BCS503", "name": "Theory of Computation", "faculty": "Dr. Nagaveni Biradar", "kind": "theory", "credits": 0},
+            {"id": "WTL", "code": "BCSL504", "name": "Web Technology Lab", "faculty": "Dr. Puneeth G J", "kind": "lab", "credits": 0},
+            {"id": "USP", "code": "BCS515C", "name": "Unix System Programming", "faculty": "Prof. Naga Ashwini Nayak V J", "kind": "theory", "credits": 0},
+            {"id": "MP", "code": "BCS586", "name": "Mini Project", "faculty": "Dr. Girisha H", "kind": "project", "credits": 0},
+            {"id": "RMIPR", "code": "BRMK557", "name": "Research Methodology and IPR", "faculty": "Prof. Mahindra K C", "kind": "theory", "credits": 0},
+            {"id": "EVS", "code": "BCS508", "name": "Environmental Studies and E-waste Management", "faculty": "Mrs. Raja Selvi", "kind": "theory", "credits": 0}
+        ],
+        faculty: [
+            {"name": "Prof. Suresh K", "subject": "Software Engineering & Project Management", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Dr. Prabhavathi S", "subject": "Computer Networks", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Dr. Nagaveni Biradar", "subject": "Theory of Computation", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Dr. Puneeth G J", "subject": "Web Technology Lab", "dept": "CSE", "emoji": "👨‍🏫"},
+            {"name": "Prof. Naga Ashwini Nayak V J", "subject": "Unix System Programming", "dept": "CSE", "emoji": "👩‍🏫"},
+            {"name": "Dr. Girisha H", "subject": "Mini Project", "dept": "CSE", "emoji": "👨‍🏫"},
+            {"name": "Prof. Mahindra K C", "subject": "Research Methodology and IPR", "dept": "CSE", "emoji": "👨‍🏫"},
+            {"name": "Mrs. Raja Selvi", "subject": "Environmental Studies and E-waste Management", "dept": "CSE", "emoji": "👩‍🏫"}
+        ],
+        timetable: {
+            1: [
+                {t: 540, n: 1, sub: "USP"},
+                {t: 595, n: 1, sub: "SE"},
+                {t: 660, n: 1, sub: "TOC"},
+                {t: 715, n: 1, sub: "CN"},
+                {t: 855, n: 3, sub: "MP"}
+            ],
+            2: [
+                {t: 540, n: 1, sub: "TOC"},
+                {t: 595, n: 1, sub: "CN"},
+                {t: 660, n: 1, sub: "SE"},
+                {t: 715, n: 1, sub: "USP"},
+                {t: 855, n: 1, sub: "RMIPR"},
+                {t: 910, n: 2, title: "Computer Networks Lab", detail: "Whole class. CN laboratory sessions", kind: "lab"}
+            ],
+            3: [
+                {t: 540, n: 1, sub: "CN"},
+                {t: 595, n: 1, sub: "SE"},
+                {t: 660, n: 1, sub: "TOC"},
+                {t: 715, n: 1, sub: "USP"},
+                {t: 855, n: 3, sub: "MP"}
+            ],
+            4: [
+                {t: 540, n: 1, sub: "SE"},
+                {t: 595, n: 1, sub: "RMIPR"},
+                {t: 660, n: 1, sub: "EVS"},
+                {t: 715, n: 1, sub: "TOC"},
+                {t: 855, n: 3, title: "Web Technology Lab", detail: "Batch C1 (roll numbers 01 to 28) has this lab today. The other batch has it on another day.", kind: "lab"}
+            ],
+            5: [
+                {t: 540, n: 1, sub: "CN"},
+                {t: 595, n: 1, sub: "TOC"},
+                {t: 660, n: 1, sub: "SE"},
+                {t: 715, n: 1, sub: "USP"},
+                {t: 855, n: 3, title: "Web Technology Lab", detail: "Batch C2 (roll numbers 29 to 59) has this lab today. The other batch has it on another day.", kind: "lab"}
+            ],
+            6: [
+                {t: 540, n: 1, sub: "RMIPR"},
+                {t: 595, n: 1, sub: "USP"},
+                {t: 660, n: 1, sub: "CN"},
+                {t: 715, n: 1, sub: "EVS"}
+            ]
+        },
+        exams: []
+    }
+};
+
+// Third year (Semester 5) CSE AI & ML, section A. Timetable and subject staff only.
+const SEM5_AIML_A = {
+    note: "CSE (AI & ML) section A, Semester 5, LH-106. Break 10:50 to 11:00, lunch 12:50 to 2:15. Lab batches: B1 is roll numbers 01 to 32, B2 is 33 to 64.",
+    subjects: [
+        {"id": "SEPM", "code": "BCS501", "name": "Software Engineering & Project Management", "faculty": "Mr. Shiva Kumar", "kind": "theory", "credits": 0},
+        {"id": "CN", "code": "BCS502", "name": "Computer Networks", "faculty": "Dr. Shilpa Patil", "kind": "theory", "credits": 0},
+        {"id": "TOC", "code": "BCS503", "name": "Theory of Computation", "faculty": "Prof. Sunitha S", "kind": "theory", "credits": 0},
+        {"id": "DVL", "code": "BAIL504", "name": "Data Visualization Lab", "faculty": "Mr. Shiva Kumar", "kind": "lab", "credits": 0},
+        {"id": "UNIX", "code": "BCS515C", "name": "Unix System Programming", "faculty": "Mrs. Nazneen Jaha", "kind": "theory", "credits": 0},
+        {"id": "MP", "code": "BCI586", "name": "Mini Project", "faculty": "Mr. Gangadhar G H", "kind": "project", "credits": 0},
+        {"id": "RM", "code": "BRMK557", "name": "Research Methodology and IPR", "faculty": "Dr. Kusammanavara Basavaraj", "kind": "theory", "credits": 0},
+        {"id": "ENV", "code": "BCS508", "name": "Environmental Studies and E-waste Management", "faculty": "Prof. Manohar Panchal", "kind": "theory", "credits": 0}
+    ],
+    faculty: [
+        {"name": "Mr. Shiva Kumar", "subject": "Software Engineering & Project Management", "dept": "CSE (AI & ML)", "emoji": "👨‍🏫"},
+        {"name": "Dr. Shilpa Patil", "subject": "Computer Networks", "dept": "CSE (AI & ML)", "emoji": "👩‍🏫"},
+        {"name": "Prof. Sunitha S", "subject": "Theory of Computation", "dept": "CSE (AI & ML)", "emoji": "👨‍🏫"},
+        {"name": "Mr. Shiva Kumar", "subject": "Data Visualization Lab", "dept": "CSE (AI & ML)", "emoji": "👨‍🏫"},
+        {"name": "Mrs. Nazneen Jaha", "subject": "Unix System Programming", "dept": "CSE (AI & ML)", "emoji": "👩‍🏫"},
+        {"name": "Mr. Gangadhar G H", "subject": "Mini Project", "dept": "CSE (AI & ML)", "emoji": "👨‍🏫"},
+        {"name": "Dr. Kusammanavara Basavaraj", "subject": "Research Methodology and IPR", "dept": "CSE (AI & ML)", "emoji": "👨‍🏫"},
+        {"name": "Prof. Manohar Panchal", "subject": "Environmental Studies and E-waste Management", "dept": "CSE (AI & ML)", "emoji": "👨‍🏫"}
+    ],
+    timetable: {
+        1: [
+            {t: 540, n: 2, title: "DV Lab / CN Lab", detail: "Batch B1 (roll numbers 01 to 32) and Batch B2 (33 to 64) take Data Visualization Lab and Computer Networks Lab, one each", kind: "lab"},
+            {t: 660, n: 1, sub: "TOC"},
+            {t: 715, n: 1, sub: "SEPM"},
+            {t: 855, n: 1, sub: "CN"},
+            {t: 910, n: 1, sub: "RM"},
+            {t: 965, n: 1, title: "Library", detail: "Read, borrow, revise", kind: "free"}
+        ],
+        2: [
+            {t: 540, n: 2, title: "DV Lab / CN Lab", detail: "Batch B1 (roll numbers 01 to 32) and Batch B2 (33 to 64) take Data Visualization Lab and Computer Networks Lab, one each", kind: "lab"},
+            {t: 660, n: 1, sub: "UNIX"},
+            {t: 715, n: 1, sub: "RM"},
+            {t: 855, n: 3, sub: "MP"}
+        ],
+        3: [
+            {t: 540, n: 1, sub: "UNIX"},
+            {t: 595, n: 1, sub: "CN"},
+            {t: 660, n: 1, sub: "TOC"},
+            {t: 715, n: 1, sub: "ENV"},
+            {t: 855, n: 3, sub: "MP"}
+        ],
+        4: [
+            {t: 540, n: 1, sub: "SEPM"},
+            {t: 595, n: 1, sub: "RM"},
+            {t: 660, n: 1, sub: "UNIX"},
+            {t: 715, n: 1, sub: "TOC"},
+            {t: 855, n: 1, sub: "SEPM"},
+            {t: 910, n: 1, sub: "RM"},
+            {t: 965, n: 1, sub: "UNIX"}
+        ],
+        5: [
+            {t: 540, n: 1, sub: "CN"},
+            {t: 595, n: 1, sub: "TOC"},
+            {t: 660, n: 1, sub: "RM"},
+            {t: 715, n: 1, sub: "CN"},
+            {t: 855, n: 1, sub: "SEPM"},
+            {t: 910, n: 2, title: "Assignment", detail: "Assignment hour", kind: "free"}
+        ],
+        6: [
+            {t: 540, n: 1, sub: "SEPM"},
+            {t: 595, n: 1, sub: "CN"},
+            {t: 660, n: 1, sub: "TOC"},
+            {t: 715, n: 1, sub: "UNIX"}
+        ]
+    },
+    exams: []
+};
+
+// Third year (Semester 5) ECE section B. Timetable and subject staff only.
+const SEM5_ECE = {
+    note: "ECE section B, Semester 5, LH-102. Break 10:50 to 11:00, lunch 12:50 to 2:15. Lab batches: B1 is roll numbers 01 to 19, B2 is 20 to 38, B3 is 39 onwards. Digital Communication Lab batches: B1 is 01 to 29, B2 is 30 onwards.",
+    subjects: [
+        {"id": "TIME", "code": "BEC501", "name": "Technological Innovation and Management Entrepreneurship", "faculty": "Mr. Shridhar S. Bilagi", "kind": "theory", "credits": 0},
+        {"id": "DSP", "code": "BEC502", "name": "Digital Signal Processing", "faculty": "Mr. Santhosh M / Mrs. Vani H", "kind": "theory", "credits": 0},
+        {"id": "DC", "code": "BEC503", "name": "Digital Communication", "faculty": "Mrs. Radhika Y T", "kind": "theory", "credits": 0},
+        {"id": "SOC", "code": "BEC515D", "name": "Satellite and Optical Communication", "faculty": "Mr. Sudarshan Banakar", "kind": "theory", "credits": 0},
+        {"id": "RMIPR", "code": "BRMK557", "name": "Research Methodology and IPR", "faculty": "Dr. Savita Sonoli", "kind": "theory", "credits": 0},
+        {"id": "EVS", "code": "BESK508 / BPEK559", "name": "Environmental Studies / Physical Education", "faculty": "Mrs. Kavya N / Mr. Sudarshan Banakar", "kind": "theory", "credits": 0},
+        {"id": "DCL", "code": "BECL504", "name": "Digital Communication Lab", "faculty": "Mr. Vinay A / Mr. Sudarshan Banakar", "kind": "lab", "credits": 0},
+        {"id": "MP", "code": "BEC586", "name": "Mini Project", "faculty": "Dr. Savita Sonoli", "kind": "project", "credits": 0}
+    ],
+    faculty: [
+        {"name": "Mr. Shridhar S. Bilagi", "subject": "Technological Innovation and Management Entrepreneurship", "dept": "ECE", "emoji": "👨‍🏫"},
+        {"name": "Mr. Santhosh M", "subject": "Digital Signal Processing", "dept": "ECE", "emoji": "👨‍🏫"},
+        {"name": "Mrs. Vani H", "subject": "Digital Signal Processing", "dept": "ECE", "emoji": "👩‍🏫"},
+        {"name": "Mrs. Radhika Y T", "subject": "Digital Communication", "dept": "ECE", "emoji": "👩‍🏫"},
+        {"name": "Mr. Sudarshan Banakar", "subject": "Satellite and Optical Communication", "dept": "ECE", "emoji": "👨‍🏫"},
+        {"name": "Dr. Savita Sonoli", "subject": "Research Methodology and IPR", "dept": "ECE", "emoji": "👩‍🏫"},
+        {"name": "Mrs. Kavya N", "subject": "Environmental Studies / Physical Education", "dept": "ECE", "emoji": "👩‍🏫"},
+        {"name": "Mr. Sudarshan Banakar", "subject": "Environmental Studies / Physical Education", "dept": "ECE", "emoji": "👨‍🏫"},
+        {"name": "Mr. Vinay A", "subject": "Digital Communication Lab", "dept": "ECE", "emoji": "👨‍🏫"},
+        {"name": "Mr. Sudarshan Banakar", "subject": "Digital Communication Lab", "dept": "ECE", "emoji": "👨‍🏫"},
+        {"name": "Dr. Savita Sonoli", "subject": "Mini Project", "dept": "ECE", "emoji": "👩‍🏫"}
+    ],
+    timetable: {
+        1: [
+            {t: 540, n: 1, sub: "DSP"},
+            {t: 595, n: 1, sub: "TIME"},
+            {t: 660, n: 1, sub: "SOC"},
+            {t: 715, n: 1, sub: "RMIPR"},
+            {t: 855, n: 1, sub: "DC"},
+            {t: 910, n: 1, sub: "RMIPR"},
+            {t: 965, n: 1, sub: "TIME"}
+        ],
+        2: [
+            {t: 540, n: 1, sub: "TIME"},
+            {t: 595, n: 1, sub: "RMIPR"},
+            {t: 660, n: 1, sub: "DC"},
+            {t: 715, n: 1, sub: "DSP"},
+            {t: 855, n: 1, sub: "DC"},
+            {t: 910, n: 1, sub: "SOC"},
+            {t: 965, n: 1, sub: "DSP"}
+        ],
+        3: [
+            {t: 540, n: 1, sub: "DC"},
+            {t: 595, n: 1, sub: "SOC"},
+            {t: 660, n: 1, sub: "EVS"},
+            {t: 715, n: 1, sub: "TIME"},
+            {t: 855, n: 1, title: "Physical Education / Counselling", detail: "Physical education and counselling hour", kind: "free"},
+            {t: 910, n: 2, sub: "MP"}
+        ],
+        4: [
+            {t: 540, n: 1, sub: "SOC"},
+            {t: 595, n: 1, sub: "DC"},
+            {t: 660, n: 2, title: "DSP Lab / Training / Skill Lab", detail: "Batches B1 (roll numbers 01 to 19), B2 (20 to 38) and B3 (39 onwards) rotate between the Digital Signal Processing Lab, training sessions and skill lab", kind: "lab"},
+            {t: 855, n: 3, sub: "DCL"}
+        ],
+        5: [
+            {t: 540, n: 1, sub: "DSP"},
+            {t: 595, n: 1, sub: "SOC"},
+            {t: 660, n: 1, sub: "TIME"},
+            {t: 715, n: 1, sub: "DSP"},
+            {t: 855, n: 3, sub: "DCL"}
+        ],
+        6: [
+            {t: 540, n: 1, sub: "RMIPR"},
+            {t: 595, n: 1, sub: "DCL"},
+            {t: 660, n: 2, sub: "DCL"}
+        ]
+    },
+    exams: []
+};
+
 // First year (Semester 1) sections: A CSE, B CSE, C AI & ML, D AI & ML + ISE, E CSE Data Science & Cyber, F EEE, G ECE, H Civil + Mechanical.
 const CLASS_DATA = {
     'CSE-A|1': SEM1.A,
@@ -619,8 +977,14 @@ const CLASS_DATA = {
     'ISE|1': SEM1.D,
     'DS|1': SEM1.E,
     'EEE|1': SEM1.F,
-    'ECE|1': SEM1.G,
+    'ECE-A|1': SEM1.G,
+    'ECE-B|1': SEM1.G,
     'CIVIL|1': SEM1.H,
+    'CSE-A|5': SEM5.A,
+    'CSE-B|5': SEM5.B,
+    'CSE-C|5': SEM5.C,
+    'AIML-A|5': SEM5_AIML_A,
+    'ECE-B|5': SEM5_ECE,
     'ME|1': SEM1.H,
     'CSE-A|3': {
         note: 'Odd semester, AY 2026-27. Break 10:50 to 11:00, lunch 12:50 to 2:15. Lab batches: A1 is roll numbers 01 to 29, A2 is 30 to 58.',
