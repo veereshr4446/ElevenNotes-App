@@ -95,6 +95,12 @@
 
         <!-- ATTENDANCE PLANNER -->
         <div class="tool" id="tool-att">
+            <div class="seg small" id="attModes" role="tablist">
+                <button role="tab" class="on" data-act="att-mode" data-m="track">Tracker</button>
+                <button role="tab" data-act="att-mode" data-m="plan">Planner</button>
+            </div>
+            <div id="attTrack"></div>
+            <div id="attPlan" hidden>
             <div class="sheet-paper">
                 <h2>Attendance planner</h2>
                 <p class="muted">Type your own numbers to see how many classes you can miss, or must attend.</p>
@@ -108,6 +114,7 @@
                     <div class="big" id="wiVal">--</div>
                     <div class="muted" id="wiNote"></div>
                 </div>
+            </div>
             </div>
         </div>
 
