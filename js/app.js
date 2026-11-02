@@ -45,9 +45,10 @@
         customExams: get('customExams', []),
         sgpa: get('sgpa', null),
         focusMin: get('focusMin', 25),
-        sessions: get('sessions', [])
+        sessions: get('sessions', []),
+        att: get('att', {})
     };
-    const ui = { lib: { items: [], loaded: false, loading: false, error: false }, libQ: '', fBranch: null, fSem: null, studyTab: 'subjects', day: 0, planFilter: 'all', exam: 'last' };
+    const ui = { lib: { items: [], loaded: false, loading: false, error: false }, libQ: '', fBranch: null, fSem: null, fKind: 'all', studyTab: 'subjects', attMode: 'track', attDay: 0, day: 0, planFilter: 'all', exam: 'last' };
 
     const save = k => set(k, S[k]);
 
@@ -257,7 +258,7 @@
     // ============================================================
     //  SHARED LIBRARY — Google Drive links shared with the class.
     //  Stored in a free Supabase database (see supabase/setup.sql).
-    //  Each upload gets a 6-digit PIN; only the PIN can delete it.
+    //  Each upload gets a password (6 to 30 characters); only that password can edit or delete it.
     //  The PIN is hashed on the server and never stored in plain text.
     // ============================================================
     const CFG = window.ELEVEN_CONFIG || {};
@@ -271,6 +272,7 @@
     const fBranch = () => ui.fBranch == null ? 'all' : ui.fBranch;
     const fSem = () => ui.fSem == null ? 'all' : ui.fSem;
     const groupName = g => (NOTE_BRANCHES.find(b => b.id === g) || { name: g }).name;
+    const NOTE_TYPES = [['Notes', 'Notes'], ['Question paper', 'Question papers'], ['Lab manual', 'Lab manuals'], ['Assignment', 'Assignments']];
     const DRIVE_RE = /^https:\/\/(drive|docs)\.google\.com\//i;
 
     async function rpc(name, args) {
@@ -302,7 +304,7 @@
                 catch (e1) { items = await rpc('list_resources', { p_class: classKey() }); ui.lib.votes = false; }
                 items = (items || []).map(n => Object.assign({ class_key: classKey() }, n));
             }
-            ui.lib.items = (items || []).map(n => Object.assign({ votes: 0, voted: false }, n))
+            ui.lib.items = (items || []).map(n => Object.assign({ votes: 0, voted: false, kind: 'Notes' }, n))
                 .sort((a, b) => (b.votes - a.votes) || (new Date(b.created_at) - new Date(a.created_at)));
             ui.lib.loaded = true;
         }
@@ -323,23 +325,24 @@
         const L = ui.lib, q = ui.libQ.trim().toLowerCase();
         const mine = get('mineLib', []), reported = get('reportedLib', []);
         const fb = fBranch(), fs = fSem();
-        const shownItems = L.items.filter(n => { const k = parseKey(n.class_key); return (fb === 'all' || k.group === fb) && (fs === 'all' || String(k.sem) === fs); });
+        const shownItems = L.items.filter(n => { const k = parseKey(n.class_key); return (fb === 'all' || k.group === fb) && (fs === 'all' || String(k.sem) === fs) && (ui.fKind === 'all' || n.kind === ui.fKind); });
         let list;
         if (L.loading && !L.items.length) list = `<div class="sheet-paper empty"><b>Loading notes…</b></div>`;
         else if (L.error) list = `<div class="sheet-paper empty"><b>Could not load the notes</b>Check your internet and tap Refresh.</div>`;
         else if (!shownItems.length) list = `<div class="sheet-paper empty"><b>No notes here yet</b>${L.items.length ? 'Try another branch or semester above, or' : 'Be the first.'} Tap “Upload notes” to add a Google Drive link.</div>`;
         else list = `<div class="flat" id="libList">${shownItems.map(n => `
             <div class="note" data-hay="${esc(libItemHay(n))}" ${q && !libItemHay(n).includes(q) ? 'hidden' : ''}>
-                <div class="note-top"><span class="code-chip">${esc(n.subject)}</span><span class="date-sm">${esc(new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }))}</span></div>
+                <div class="note-top"><span class="note-chips"><span class="code-chip">${esc(n.subject)}</span>${n.kind && n.kind !== 'Notes' ? `<span class="kind-chip">${esc(n.kind)}</span>` : ''}</span><span class="date-sm">${esc(new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }))}</span></div>
                 <h3>${esc(n.title)}</h3><p>Shared by ${esc(n.uploader)} · ${esc(groupName(parseKey(n.class_key).group))}${parseKey(n.class_key).sem ? ' Sem ' + parseKey(n.class_key).sem : ''}${mine.includes(n.id) ? ' <span class="tag">You</span>' : ''}</p>
                 <div class="note-actions">${L.votes ? `<button class="vote ${n.voted ? 'on' : ''}" data-act="lib-vote" data-id="${esc(n.id)}" aria-pressed="${n.voted}" aria-label="Like"><svg class="i" viewBox="0 0 24 24"><path d="M12 20.5s-8.5-5.2-8.5-11A4.6 4.6 0 0 1 12 6.8a4.6 4.6 0 0 1 8.5 2.7c0 5.8-8.5 11-8.5 11z"/></svg><span>${n.votes}</span></button>` : ''}<a class="link-btn" href="${esc(n.url)}" target="_blank" rel="noopener noreferrer">Open link</a><button class="dots" data-act="lib-menu" data-id="${esc(n.id)}" aria-label="More options"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></div>
             </div>`).join('')}</div><div class="empty" id="libNone" hidden><b>No match</b>Try a different subject or title.</div>`;
-        return `<p class="fine" style="margin:0 0 12px">Notes shared by your classmates as Google Drive links. Anyone can upload. Only the person who uploaded can delete, using their 6-digit PIN.</p>
+        return `<p class="fine" style="margin:0 0 12px">Notes shared by your classmates as Google Drive links. Anyone can upload. Only the person who uploaded can edit or delete it, using their password.</p>
             <div class="lib-actions"><button class="btn primary small" data-act="lib-add">Upload notes</button><button class="btn ghost small" data-act="lib-refresh">${L.loading ? 'Loading…' : 'Refresh'}</button></div>
             <div class="lib-filters">
                 <label>Branch<select id="libBranch"><option value="all" ${fb === 'all' ? 'selected' : ''}>All branches</option>${NOTE_BRANCHES.map(b => `<option value="${b.id}" ${fb === b.id ? 'selected' : ''}>${b.name}</option>`).join('')}</select></label>
                 <label>Semester<select id="libSem"><option value="all" ${fs === 'all' ? 'selected' : ''}>All semesters</option>${SEMESTERS.map(n => `<option value="${n}" ${fs === String(n) ? 'selected' : ''}>Semester ${n}</option>`).join('')}</select></label>
             </div>
+            <div class="chips" id="libKinds">${[['all', 'All']].concat(NOTE_TYPES).map(([v, t]) => `<button class="chip ${ui.fKind === v ? 'on' : ''}" data-act="lib-kind" data-k="${esc(v)}">${t}</button>`).join('')}</div>
             ${L.items.length ? `<input class="lib-search" id="libSearch" type="search" placeholder="Search by subject or title" value="${esc(ui.libQ)}" autocomplete="off" aria-label="Search notes" />` : ''}
             ${list}
             <p class="fine">Make sure the Drive link is set to “Anyone with the link can view”. Only Google Drive and Docs links are accepted. Report anything that does not belong here.</p>${legacy}`;
@@ -351,9 +354,10 @@
         const none = $('#libNone'); if (none) none.hidden = shown > 0;
     }
 
-    function randomPin() {
-        const a = new Uint32Array(1); crypto.getRandomValues(a);
-        return String(a[0] % 1000000).padStart(6, '0');
+    function randomPassword() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789', a = new Uint32Array(8); crypto.getRandomValues(a);
+        const p = Array.from(a, n => chars[n % chars.length]).join('');
+        return p.slice(0, 4) + '-' + p.slice(4);
     }
 
     function libAddSheet(subject) {
@@ -363,27 +367,29 @@
                 <label>Branch<select name="branch">${NOTE_BRANCHES.map(b => `<option value="${b.id}" ${ub === b.id ? 'selected' : ''}>${b.name}</option>`).join('')}</select></label>
                 <label>Semester<select name="sem">${SEMESTERS.map(n => `<option value="${n}" ${us === String(n) ? 'selected' : ''}>Semester ${n}</option>`).join('')}</select></label>
             </div>
+            <label>Type<select name="kind">${NOTE_TYPES.map(([v, t]) => `<option value="${v}" ${v === (ui.fKind !== 'all' ? ui.fKind : 'Notes') ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
             <label>Subject name<input name="subject" maxlength="20" required value="${esc(subject || '')}" placeholder="e.g. DSA, Maths, Java" autocapitalize="words" /></label>
-            <label>Title<input name="title" maxlength="80" required placeholder="e.g. Unit 3 notes" /></label>
+            <label>Title<input name="title" maxlength="80" required placeholder="e.g. Unit 3 notes or 2023 question paper" /></label>
             <label>Google Drive link<input type="url" name="url" required placeholder="https://drive.google.com/..." /></label>
             <label>Your name <span class="opt">(shown to others)</span><input name="uploader" maxlength="30" value="${esc(S.profile.name)}" /></label>
-            <label>Delete PIN <span class="opt">(6 digits, you will need it to delete)</span>
-                <span class="pin-row"><input name="pin" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" minlength="6" required placeholder="------" autocomplete="off" /><button type="button" class="btn ghost small" data-act="pin-gen">Make one for me</button></span></label>
+            <label>Password <span class="opt">(6 to 30 characters, you need it to edit or delete)</span>
+                <span class="pin-row"><input type="password" name="pin" minlength="6" maxlength="30" required placeholder="Choose a password" autocomplete="new-password" /><button type="button" class="btn ghost small" data-act="pin-show">Show</button></span></label>
+            <button type="button" class="btn ghost small" data-act="pin-gen" style="margin:-4px 0 10px">Make one for me</button>
             <button class="btn primary block" type="submit">Upload</button></form>`);
     }
 
     function receiptSheet(d) {
-        const text = `ElevenNotes notes link\nTitle: ${d.title}\nSubject: ${d.subject}\nLink: ${d.url}\nShared by: ${d.uploader}\nDate: ${d.date}\nDelete PIN: ${d.pin}\n\nKeep this PIN safe. It is the only way to delete this link, and it cannot be recovered.`;
+        const text = `ElevenNotes notes link\nTitle: ${d.title}\nSubject: ${d.subject}\nLink: ${d.url}\nShared by: ${d.uploader}\nDate: ${d.date}\nPassword: ${d.pin}\n\nKeep this password safe. It is the only way to edit or delete this link, and it cannot be recovered.`;
         let copied = false;
-        openSheet('Uploaded. Save your PIN', `<div class="ticket">
+        openSheet('Uploaded. Save your password', `<div class="ticket">
                 <div class="ticket-row"><span>Title</span><b>${esc(d.title)}</b></div>
                 <div class="ticket-row"><span>Subject</span><b>${esc(d.subject)}</b></div>
                 <div class="ticket-row"><span>Link</span><b class="brk">${esc(d.url)}</b></div>
                 <div class="ticket-row"><span>Shared by</span><b>${esc(d.uploader)}</b></div>
                 <div class="ticket-row"><span>Date</span><b>${esc(d.date)}</b></div>
-                <div class="ticket-pin"><span>Delete PIN</span><b>${esc(d.pin)}</b></div>
+                <div class="ticket-pin"><span>Password</span><b>${esc(d.pin)}</b></div>
             </div>
-            <p class="fine" style="margin-top:12px">Copy these details or take a screenshot. This PIN is shown only once and cannot be recovered. Without it, nobody (including you) can delete this link.</p>
+            <p class="fine" style="margin-top:12px">Copy these details or take a screenshot. This password is shown only once and cannot be recovered. Without it, nobody (including you) can edit or delete this link.</p>
             <button class="btn primary block" id="copyAll">Copy all details</button>
             <button class="btn ghost block" data-act="close-sheet">I have saved it</button>`);
         $('#copyAll').addEventListener('click', async () => {
@@ -395,7 +401,7 @@
             }
             if (ok) { copied = true; $('#copyAll').textContent = 'Copied'; } else toast('Could not copy. Please take a screenshot instead.', 'err');
         });
-        sheetGuard = () => copied || confirm('Have you saved your PIN (' + d.pin + ')? It cannot be recovered. Close anyway?');
+        sheetGuard = () => copied || confirm('Have you saved your password (' + d.pin + ')? It cannot be recovered. Close anyway?');
         // the "I have saved it" button counts as confirmation
         $('#sheetBody [data-act="close-sheet"]').addEventListener('click', () => { copied = true; }, true);
     }
@@ -404,8 +410,18 @@
         const it = ui.lib.items.find(i => i.id === id); if (!it) return;
         openSheet('Delete this link', `<form data-form="unshare"><input type="hidden" name="id" value="${esc(id)}" />
             <p><b>${esc(it.title)}</b></p>
-            <label>Enter the 6-digit PIN you got when you shared it<input type="password" name="pin" maxlength="64" required placeholder="------" autocomplete="off" /></label>
+            <label>Enter the password you set when you shared it <span class="opt">(older notes: the 6-digit PIN)</span><input type="password" name="pin" maxlength="64" required placeholder="Password" autocomplete="off" /></label>
             <button class="btn danger block" type="submit">Delete</button></form>`);
+    }
+
+    function libEditSheet(id) {
+        const it = ui.lib.items.find(i => i.id === id); if (!it) return;
+        openSheet('Edit details', `<form data-form="edit-note"><input type="hidden" name="id" value="${esc(id)}" />
+            <label>Subject name<input name="subject" maxlength="20" required value="${esc(it.subject)}" autocapitalize="words" /></label>
+            <label>Title<input name="title" maxlength="80" required value="${esc(it.title)}" /></label>
+            <label>Google Drive link<input type="url" name="url" required value="${esc(it.url)}" /></label>
+            <label>Your password <span class="opt">(older notes: the 6-digit PIN)</span><input type="password" name="pin" maxlength="64" required placeholder="Password" autocomplete="off" /></label>
+            <button class="btn primary block" type="submit">Save changes</button></form>`);
     }
 
 
@@ -620,7 +636,7 @@
         $$('#toolTabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
         $$('.tool').forEach(t => t.classList.toggle('on', t.id === 'tool-' + tab));
         if (tab === 'count') renderCountdown();
-        if (tab === 'att') calcWhatIf(false);
+        if (tab === 'att') { renderAtt(); calcWhatIf(false); }
         if (tab === 'sgpa') calcSgpa(false);
         if (tab === 'focus') timerUI();
     }
@@ -649,6 +665,57 @@
         $('#sgpaVal').textContent = n ? (pts / cr).toFixed(2) : '--';
         $('#sgpaNote').textContent = n ? `${cr} credits across ${n} subject${n > 1 ? 's' : ''}` : 'Add marks to see your SGPA';
         if (n && userInput && !S.stats.sgpaUsed) { S.stats.sgpaUsed = true; save('stats'); checkProgress(); }
+    }
+
+    // ----- attendance tracker -----
+    // Marks are kept on this device only: S.att[date][startMinute] = { s: 'p' | 'a' | 'x', k: subject key, n: periods }.
+    const attTarget = () => { const t = +get('attTarget', 85); return t >= 50 && t <= 100 ? t : 85; };
+    const attDate = () => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + ui.attDay); return d; };
+    function attStats() {
+        const m = {};
+        Object.keys(S.att).forEach(day => Object.keys(S.att[day]).forEach(t => {
+            const r = S.att[day][t]; if (!r || (r.s !== 'p' && r.s !== 'a')) return;
+            const x = m[r.k] || (m[r.k] = { k: r.k, held: 0, att: 0 });
+            x.held += r.n || 1; if (r.s === 'p') x.att += r.n || 1;
+        }));
+        return Object.keys(m).map(k => m[k]).sort((a, b) => a.k.localeCompare(b.k));
+    }
+    function attHint(x, tgt) {
+        const pct = x.held ? x.att / x.held * 100 : 0;
+        if (pct >= tgt) { const skip = Math.floor(x.att * 100 / tgt - x.held + 1e-9); return skip > 0 ? `You can miss ${skip} more` : 'No spare classes yet, keep attending'; }
+        const need = Math.ceil((tgt * x.held - 100 * x.att) / (100 - tgt) - 1e-9);
+        return tgt >= 100 ? 'Cannot reach this target' : `Attend the next ${need} class${need === 1 ? '' : 'es'} to reach ${tgt}%`;
+    }
+    function renderAtt() {
+        const planOn = ui.attMode === 'plan';
+        $$('#attModes button').forEach(b => b.classList.toggle('on', b.dataset.m === ui.attMode));
+        $('#attTrack').hidden = planOn; $('#attPlan').hidden = !planOn;
+        if (planOn) { calcWhatIf(false); return; }
+        const d = attDate(), key = dkey(d), dow = d.getDay();
+        const label = ui.attDay === 0 ? 'Today' : ui.attDay === -1 ? 'Yesterday' : d.toLocaleDateString('en-IN', { weekday: 'long' });
+        const list = (TIMETABLE[dow] || []).filter(e => entryInfo(e).kind !== 'free');
+        const marks = S.att[key] || {};
+        const rows = !Object.keys(TIMETABLE).length ? `<div class="row"><span class="grow"><b>Timetable not added yet</b><span>The tracker needs your class timetable.</span></span></div>`
+            : !list.length ? `<div class="row"><span class="grow"><b>No classes this day</b><span>Use the arrows to pick another day.</span></span></div>`
+            : list.map(e => {
+                const info = entryInfo(e), st = (marks[e.t] || {}).s || '';
+                const b = (v, txt) => `<button class="${st === v ? 'on' : ''}" data-act="att-mark" data-t="${e.t}" data-v="${v}" aria-pressed="${st === v}">${txt}</button>`;
+                return `<div class="att-class"><div class="att-top"><span class="code-chip ${info.kind}">${esc(e.sub || 'Lab')}</span><span class="grow"><b>${esc(info.title)}</b><span>${fmtTime(e.t)}${e.n > 1 ? ' · ' + e.n + ' periods' : ''}</span></span></div>
+                    <div class="seg small att-seg">${b('p', 'Present')}${b('a', 'Absent')}${b('x', 'No class')}</div></div>`;
+            }).join('');
+        const tgt = attTarget(), stats = attStats();
+        const tot = stats.reduce((o, x) => ({ held: o.held + x.held, att: o.att + x.att }), { held: 0, att: 0 });
+        const opct = tot.held ? Math.round(tot.att / tot.held * 100) : null;
+        $('#attTrack').innerHTML = `<div class="sheet-paper">
+            <div class="att-nav"><button class="icon-btn" data-act="att-day" data-d="-1" aria-label="Previous day">‹</button><div><b>${label}</b><span>${d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span></div><button class="icon-btn" data-act="att-day" data-d="1" aria-label="Next day" ${ui.attDay >= 0 ? 'disabled' : ''}>›</button></div>
+            <div class="flat att-list">${rows}</div></div>
+            <div class="sheet-paper" style="margin-top:14px">
+                <div class="att-head"><div><h2>Your attendance</h2><p class="muted">${opct === null ? 'Mark your classes above and the numbers appear here.' : `${tot.att} of ${tot.held} classes attended`}</p></div>
+                    <div class="att-big ${opct !== null && opct < tgt ? 'low' : ''}">${opct === null ? '--' : opct + '%'}</div></div>
+                <label class="att-tgt">Target <select id="attTarget">${[75, 80, 85, 90].map(n => `<option value="${n}" ${n === tgt ? 'selected' : ''}>${n}%</option>`).join('')}</select></label>
+                ${stats.length ? `<div class="flat att-list">${stats.map(x => { const p = x.held ? Math.round(x.att / x.held * 100) : 0, s = SUB[x.k]; return `<div class="row"><span class="code-chip ${s ? s.kind : 'lab'}">${esc(x.k.length > 8 ? 'Lab' : x.k)}</span><span class="grow"><b>${esc(s ? s.name : x.k)}</b><span>${x.att}/${x.held} classes · ${esc(attHint(x, tgt))}</span></span><b class="att-pct ${p < tgt ? 'low' : ''}">${p}%</b></div>`; }).join('')}</div>` : ''}
+                ${stats.length ? `<button class="btn ghost block" data-act="att-clear" style="margin-top:12px">Clear attendance</button>` : ''}
+                <p class="fine">Saved only on this phone. It is your own record, so check it against your college's official attendance.</p></div>`;
     }
 
     // ----- attendance planner -----
@@ -800,27 +867,50 @@
             if (title.length < 2) { formError(f, 'Please add a title.'); return; }
             if (!f.subject.value.trim()) { formError(f, 'Please type the subject name.'); return; }
             if (!DRIVE_RE.test(url)) { formError(f, 'Please paste a Google Drive or Google Docs link.'); return; }
-            if (!/^[0-9]{6}$/.test(pin)) { formError(f, 'The PIN must be exactly 6 digits.'); return; }
+            if (pin.length < 6 || pin.length > 30) { formError(f, 'The password must be 6 to 30 characters.'); return; }
             const btn = f.querySelector('[type=submit]'); btn.disabled = true; btn.textContent = 'Uploading…';
             const d = { title, url, pin, subject: f.subject.value.trim(), uploader: f.uploader.value.trim() || 'Student', date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) };
             try {
-                const id = await rpc('add_resource', { p_class: f.branch.value + '-' + f.sem.value, p_title: d.title, p_subject: d.subject, p_url: d.url, p_uploader: d.uploader, p_pin: pin });
+                const args = { p_class: f.branch.value + '-' + f.sem.value, p_title: d.title, p_subject: d.subject, p_url: d.url, p_uploader: d.uploader, p_pin: pin };
+                let id;
+                try { id = await rpc('add_resource', Object.assign({ p_kind: f.kind.value }, args)); }
+                catch (e0) { id = await rpc('add_resource', args); }   // types SQL not run yet
                 const mine = get('mineLib', []); mine.push(id); set('mineLib', mine.slice(-100));
                 ui.lib.loaded = false; ui.lib.items = [];
-                ui.fBranch = f.branch.value; ui.fSem = f.sem.value;
+                ui.fBranch = f.branch.value; ui.fSem = f.sem.value; ui.fKind = f.kind.value;
                 bump('notesAdded', 1, 'added');
                 closeSheet(); receiptSheet(d); loadLibrary();
             } catch (e) { btn.disabled = false; btn.textContent = 'Upload'; formError(f, 'Could not upload. Check your internet connection and try again.'); }
         },
+        async 'edit-note'(f) {
+            const id = f.id.value, pin = f.pin.value.trim(), title = f.title.value.trim(), url = f.url.value.trim(), subject = f.subject.value.trim();
+            if (title.length < 2) { formError(f, 'Please add a title.'); return; }
+            if (!subject) { formError(f, 'Please type the subject name.'); return; }
+            if (!DRIVE_RE.test(url)) { formError(f, 'Please paste a Google Drive or Google Docs link.'); return; }
+            if (pin.length < 6) { formError(f, 'Please enter your password.'); return; }
+            const btn = f.querySelector('[type=submit]'); btn.disabled = true; btn.textContent = 'Saving…';
+            try {
+                const r = await rpc('edit_resource', { p_id: id, p_pin: pin, p_title: title, p_subject: subject, p_url: url });
+                btn.disabled = false; btn.textContent = 'Save changes';
+                if (r === 'ok') {
+                    const it = ui.lib.items.find(i => i.id === id); if (it) { it.title = title; it.subject = subject; it.url = url; }
+                    closeSheet(); renderCurrent(); toast('Your note details are updated.', 'win', 'Saved');
+                }
+                else if (r === 'locked') formError(f, 'Too many wrong attempts. Try again in 15 minutes.');
+                else if (r === 'invalid') formError(f, 'Please check the title, subject and link.');
+                else if (r === 'missing') { closeSheet(); ui.lib.loaded = false; loadLibrary(); toast('This note no longer exists.', 'err'); }
+                else { f.pin.value = ''; f.pin.focus(); formError(f, 'That password is not correct.'); }
+            } catch (e) { btn.disabled = false; btn.textContent = 'Save changes'; formError(f, 'Could not save. Check your internet connection and try again.'); }
+        },
         async unshare(f) {
             const id = f.id.value, pin = f.pin.value.trim();
-            if (!/^[0-9]{6}$/.test(pin) && pin.length < 8) { formError(f, 'The PIN must be exactly 6 digits.'); return; }
+            if (pin.length < 6) { formError(f, 'Please enter your password.'); return; }
             const btn = f.querySelector('[type=submit]'); btn.disabled = true;
             try {
                 const r = await rpc('delete_resource', { p_id: id, p_pin: pin });
                 if (r === 'ok' || r === 'missing') { ui.lib.items = ui.lib.items.filter(i => i.id !== id); closeSheet(); renderCurrent(); }
                 else if (r === 'locked') { btn.disabled = false; formError(f, 'Too many wrong attempts. Try again in 15 minutes.'); }
-                else { btn.disabled = false; f.pin.value = ''; f.pin.focus(); formError(f, 'That PIN is not correct.'); }
+                else { btn.disabled = false; f.pin.value = ''; f.pin.focus(); formError(f, 'That password is not correct.'); }
             } catch (e) { btn.disabled = false; formError(f, 'Could not delete. Check your internet connection and try again.'); }
         },
         task(f) {
@@ -880,12 +970,27 @@
         'lib-add'() { libAddSheet(); },
         'lib-refresh'() { ui.lib.loaded = false; loadLibrary(); },
         'lib-del'(t) { libDelSheet(t.dataset.id); },
+        'lib-edit'(t) { libEditSheet(t.dataset.id); },
+        'lib-kind'(t) { ui.fKind = t.dataset.k; renderCurrent(); },
+        'att-mode'(t) { ui.attMode = t.dataset.m; renderAtt(); },
+        'att-day'(t) { ui.attDay = Math.min(0, ui.attDay + (+t.dataset.d)); renderAtt(); },
+        'att-mark'(t) {
+            const d = attDate(), key = dkey(d), tm = +t.dataset.t, v = t.dataset.v;
+            const e = (TIMETABLE[d.getDay()] || []).find(x => x.t === tm); if (!e) return;
+            const day = S.att[key] || (S.att[key] = {});
+            if (day[tm] && day[tm].s === v) delete day[tm]; else day[tm] = { s: v, k: e.sub || e.title, n: e.n || 1 };
+            if (!Object.keys(day).length) delete S.att[key];
+            save('att'); renderAtt();
+        },
+        'att-clear'() { if (confirm('Clear all attendance marks saved on this phone?')) { S.att = {}; save('att'); renderAtt(); } },
+
         'lib-menu'(t) {
             const n = ui.lib.items.find(x => x.id === t.dataset.id); if (!n) return;
             const rep = get('reportedLib', []).includes(n.id);
             openSheet(n.title, `<div class="flat menu-list">
                 <button data-act="lib-share" data-id="${esc(n.id)}"><span class="em">🔗</span><span class="grow"><b>Share</b><span>Send this link to a friend</span></span></button>
-                <button data-act="lib-del" data-id="${esc(n.id)}"><span class="em">🗑️</span><span class="grow"><b>Delete</b><span>Needs your 6-digit PIN</span></span></button>
+                <button data-act="lib-edit" data-id="${esc(n.id)}"><span class="em">✏️</span><span class="grow"><b>Edit details</b><span>Needs your password</span></span></button>
+                <button data-act="lib-del" data-id="${esc(n.id)}"><span class="em">🗑️</span><span class="grow"><b>Delete</b><span>Needs your password</span></span></button>
                 ${rep ? '<div class="menu-off"><span class="em">🚩</span><span class="grow"><b>Reported</b><span>Thanks, we will review it</span></span></div>' : `<button data-act="lib-report" data-id="${esc(n.id)}"><span class="em">🚩</span><span class="grow"><b>Report</b><span>Spam or not suitable</span></span></button>`}
             </div>`);
         },
@@ -925,7 +1030,8 @@
                 toast('Could not send the report. Please try again later.', 'err');
             });
         },
-        'pin-gen'(t) { const i = t.closest('form').pin; i.value = randomPin(); i.focus(); },
+        'pin-gen'(t) { const f = t.closest('form'), i = f.pin; i.value = randomPassword(); i.type = 'text'; const b = f.querySelector('[data-act="pin-show"]'); if (b) b.textContent = 'Hide'; i.focus(); },
+        'pin-show'(t) { const i = t.closest('form').pin; const show = i.type === 'password'; i.type = show ? 'text' : 'password'; t.textContent = show ? 'Hide' : 'Show'; },
         'add-task'() { taskSheet(); },
         'del-note'(t) { S.notes = S.notes.filter(n => n.id !== t.dataset.id); save('notes'); renderCurrent(); },
         'plan-filter'(t) { ui.planFilter = t.dataset.f; renderCurrent(); },
@@ -1002,7 +1108,8 @@
         if (el.closest('#tool-att')) calcWhatIf(true);
     });
     document.addEventListener('change', e => {
-        if (e.target.id === 'libBranch') { ui.fBranch = e.target.value; renderCurrent(); }
+        if (e.target.id === 'attTarget') { set('attTarget', +e.target.value); renderAtt(); }
+        else if (e.target.id === 'libBranch') { ui.fBranch = e.target.value; renderCurrent(); }
         else if (e.target.id === 'libSem') { ui.fSem = e.target.value; renderCurrent(); }
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSheet(); closeDev(); } });
