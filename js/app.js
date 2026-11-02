@@ -565,14 +565,18 @@
         if (restoreFocus) { const b = $('#menuBtn'); if (b) b.focus(); }
     }
     function menuGo(k) {
-        closeMenu(false);
-        if (k.indexOf('study:') === 0) { ui.studyTab = k.slice(6); go('study'); }
-        else if (k.indexOf('tool:') === 0) { go('tools'); showTool(k.slice(5)); }
-        else if (k === 'settings') settingsSheet();
-        else if (k === 'feedback') feedbackSheet();
-        else if (k === 'install') installApp();
-        else if (k === 'about') openDev();
-        else go(k);
+        // let the menu finish sliding out before the page changes, so neither animation stutters
+        const w = $('#drawerWrap'); w.classList.remove('open'); w.setAttribute('aria-hidden', 'true');
+        setTimeout(() => {
+            if (!$('#devWrap').classList.contains('open')) document.body.classList.remove('lock');
+            if (k.indexOf('study:') === 0) { ui.studyTab = k.slice(6); go('study'); }
+            else if (k.indexOf('tool:') === 0) { go('tools'); showTool(k.slice(5)); }
+            else if (k === 'settings') settingsSheet();
+            else if (k === 'feedback') feedbackSheet();
+            else if (k === 'install') installApp();
+            else if (k === 'about') openDev();
+            else go(k);
+        }, 200);
     }
 
     // ---------- ME ----------
