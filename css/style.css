@@ -114,9 +114,10 @@ img { max-width: 100%; display: block; }
 /* ---------- pages ---------- */
 main { padding: 6px 16px calc(var(--dock-h) + 44px); max-width: 720px; margin: 0 auto; }
 .page { display: none; }
-.page.on { display: block; animation: pageIn .25s ease; }
+.page.on { display: block; animation: pageIn .3s cubic-bezier(.2, .8, .2, 1); }
 /* opacity only: a transform here would trap position:fixed children (the Add task button) */
-@keyframes pageIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pageIn { from { opacity: 0; transform: translateX(22px); } to { opacity: 1; transform: none; } }
+@keyframes toolIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .ptitle { font-family: var(--font-head); font-size: 30px; font-weight: 800; letter-spacing: -0.03em; margin: 10px 0 14px; }
 h2 { font-family: var(--font-head); font-weight: 700; letter-spacing: -0.02em; }
 
@@ -205,7 +206,7 @@ label input, label select, label textarea { margin-top: 6px; font-weight: 400; }
 .mini-stats span { font-size: 13px; color: var(--ink-2); }
 
 .tool { display: none; }
-.tool.on { display: block; }
+.tool.on { display: block; animation: toolIn .22s ease; }
 
 /* ---------- HOME ---------- */
 .hello { font-family: var(--font-head); font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.12; margin: 10px 2px 16px; }
@@ -540,8 +541,11 @@ body[data-view="plan"] .fab { display: flex; }
     .badge .medal { width: 64px; height: 64px; font-size: 28px; }
     .stats4 b { font-size: 21px; }
 }
+/* Reduced motion: keep the short, gentle slides and fades that make the app feel smooth,
+   and switch off only the looping pulses and the heart pop. */
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    html { scroll-behavior: auto; }
+    .tag.live i, .music-btn { animation: none; }
 }
 
 @keyframes spinDisc { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -615,13 +619,13 @@ body[data-view="plan"] .fab { display: flex; }
 .brand-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .drawer-wrap { position: fixed; inset: 0; z-index: 70; visibility: hidden; pointer-events: none; transition: visibility 0s .25s; }
 .drawer-wrap.open { visibility: visible; pointer-events: auto; transition-delay: 0s; }
-.drawer-back { position: absolute; inset: 0; background: rgba(20, 18, 50, .45); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); opacity: 0; transition: opacity .25s; }
+.drawer-back { position: absolute; inset: 0; background: rgba(20, 18, 50, .5); opacity: 0; transition: opacity .25s; }
 .drawer-wrap.open .drawer-back { opacity: 1; }
 .drawer {
     position: absolute; top: 0; bottom: 0; left: 0; width: min(84vw, 330px);
     background: var(--card); border-radius: 0 28px 28px 0; box-shadow: 12px 0 40px -12px rgba(20, 18, 50, .45);
     display: flex; flex-direction: column; padding: max(16px, env(safe-area-inset-top)) 16px max(14px, env(safe-area-inset-bottom));
-    transform: translateX(-102%); transition: transform .28s cubic-bezier(.2, .8, .2, 1);
+    transform: translateX(-102%); transition: transform .26s cubic-bezier(.2, .8, .2, 1); will-change: transform;
 }
 .drawer-wrap.open .drawer { transform: none; }
 .drawer-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
@@ -639,4 +643,3 @@ body[data-view="plan"] .fab { display: flex; }
 .drawer-item:active { background: var(--brand-soft); }
 .drawer-item.on { background: var(--brand-soft); color: var(--brand-ink); }
 .drawer-foot { margin: 10px 0 0; padding-top: 12px; border-top: 1px solid var(--line); font-family: var(--font-head); font-weight: 700; font-size: 14px; color: var(--brand-ink); text-align: center; line-height: 1.4; }
-@media (prefers-reduced-motion: reduce) { .drawer, .drawer-back { transition-duration: .01s; } }
