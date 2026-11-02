@@ -31,10 +31,12 @@
 
 <!-- ===== TOP BAR ===== -->
 <header class="top">
-    <a class="brand" href="#home" aria-label="ElevenNotes home">
-        <img src="images/logo.svg" alt="" width="34" height="34" />
-        <span class="wordmark">ElevenNotes</span>
-    </a>
+    <div class="brand-row">
+        <button class="icon-btn" data-act="menu" id="menuBtn" aria-label="Open menu" aria-haspopup="dialog" aria-controls="drawer">
+            <svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+        </button>
+        <a class="brand" href="#home" aria-label="ElevenNotes home"><span class="wordmark">ElevenNotes</span></a>
+    </div>
     <div class="top-actions">
         <button class="icon-btn" data-act="search" aria-label="Search">
             <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
@@ -46,6 +48,11 @@
         <button class="pro-pill" data-act="pro">Pro</button>
     </div>
 </header>
+
+<div class="drawer-wrap" id="drawerWrap" aria-hidden="true">
+    <div class="drawer-back" data-act="menu-close"></div>
+    <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menu"></aside>
+</div>
 
 <!-- ===== NAVIGATION ===== -->
 <nav class="dock" aria-label="Main">
