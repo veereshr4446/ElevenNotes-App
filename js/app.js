@@ -177,7 +177,7 @@
         const h = now.getHours();
         const greet = h < 5 ? 'Still up' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 21 ? 'Good evening' : 'Good night';
         const named = S.profile.name !== 'Student';
-        const first = S.profile.name.split(' ')[0];
+        const first = S.profile.name.split(' ')[0].replace(/^(.)(.*)$/, (m, a, b) => a.toUpperCase() + b.toLowerCase());
         const list = TIMETABLE[now.getDay()] || [];
         const nextIdx = list.findIndex(e => e.t > nowMin);
         const classes = list.map((e, i) => {
@@ -198,6 +198,7 @@
 
         $('#page-home').innerHTML = `
             <h1 class="hello">${greet}${named ? ', ' + esc(first) : ''}<small>${named ? 'Here is your day.' : 'Add your name in the Me tab to personalise this.'}</small></h1>
+            ${(q => `<div class="thought"><span>Quote of the day</span><p>${esc(q[0])}</p>${q[1] ? `<em>~ ${esc(q[1])}</em>` : ''}</div>`)(quoteOfDay())}
             <button class="class-pill" data-act="pick-class" aria-label="Change class">🎓 ${esc(clsLabel())} <span>Change</span></button>
             ${(isStandalone() || get('installDismiss', false)) ? '' : `<div class="install-card"><button class="install-main" data-act="install"><span class="install-ico">📲</span><span class="grow"><b>Install ElevenNotes</b><span>Only 0.6 MB. Add it to your home screen</span></span></button><button class="install-x" data-act="install-dismiss" aria-label="Hide">✕</button></div>`}
             <div class="today">
@@ -544,6 +545,70 @@
             ['Help', [['feedback', 'Send feedback', 'chat', false]].concat(isStandalone() ? [] : [['install', 'Install app', 'install', false]]).concat([['about', 'About the developer', 'code', false]])]
         ];
     }
+    const QUOTES = [
+        ["Imagination is more important than knowledge.", "Albert Einstein"],
+        ["Dream, dream, dream. Dreams transform into thoughts and thoughts result in action.", "A. P. J. Abdul Kalam"],
+        ["Arise, awake, and stop not till the goal is reached.", "Swami Vivekananda"],
+        ["Education is the most powerful weapon which you can use to change the world.", "Nelson Mandela"],
+        ["The expert in anything was once a beginner.", "Helen Hayes"],
+        ["Success is the sum of small efforts, repeated day in and day out.", "Robert Collier"],
+        ["The only way to do great work is to love what you do.", "Steve Jobs"],
+        ["It does not matter how slowly you go as long as you do not stop.", "Confucius"],
+        ["The journey of a thousand miles begins with a single step.", "Lao Tzu"],
+        ["An investment in knowledge pays the best interest.", "Benjamin Franklin"],
+        ["Genius is one percent inspiration and ninety-nine percent perspiration.", "Thomas Edison"],
+        ["Failure is simply the opportunity to begin again, this time more intelligently.", "Henry Ford"],
+        ["You have to dream before your dreams can come true.", "A. P. J. Abdul Kalam"],
+        ["We are what we repeatedly do. Excellence, then, is not an act, but a habit.", "Will Durant"],
+        ["Live as if you were to die tomorrow. Learn as if you were to live forever.", "Mahatma Gandhi"],
+        ["In the middle of difficulty lies opportunity.", "Albert Einstein"],
+        ["Do what you can, with what you have, where you are.", "Theodore Roosevelt"],
+        ["Patience and perseverance have a magical effect before which difficulties disappear.", "John Quincy Adams"],
+        ["Don't watch the clock; do what it does. Keep going.", "Sam Levenson"],
+        ["Learn from yesterday, live for today, hope for tomorrow.", "Albert Einstein"],
+        ["Well done is better than well said.", "Benjamin Franklin"],
+        ["Small deeds done are better than great deeds planned.", "Peter Marshall"],
+        ["Courage is not the absence of fear, but the triumph over it.", "Nelson Mandela"],
+        ["Whether you think you can or you think you can't, you're right.", "Henry Ford"],
+        ["Believe you can and you're halfway there.", "Theodore Roosevelt"],
+        ["You miss 100% of the shots you don't take.", "Wayne Gretzky"],
+        ["The more that you read, the more things you will know.", "Dr. Seuss"],
+        ["Your time is limited, so don't waste it living someone else's life.", "Steve Jobs"],
+        ["Learning never exhausts the mind.", "Leonardo da Vinci"],
+        ["Strength does not come from physical capacity. It comes from an indomitable will.", "Mahatma Gandhi"],
+        ["Stay hungry, stay foolish.", "Steve Jobs"],
+        ["Push yourself, because no one else is going to do it for you.", ""],
+        ["Dream big. Start small. Act now.", ""],
+        ["Study now, shine later.", ""],
+        ["Don't stop when you're tired. Stop when you're done.", ""],
+        ["Little by little, a little becomes a lot.", ""],
+        ["Discipline is doing it even when you don't feel like it.", ""],
+        ["Today's hard work is tomorrow's confidence.", ""],
+        ["Great things never come from comfort zones.", ""],
+        ["Be stronger than your excuses.", ""],
+        ["Fall seven times, stand up eight.", ""],
+        ["The harder you work, the luckier you get.", ""],
+        ["Slow progress is still progress.", ""],
+        ["Your only limit is you.", ""],
+        ["Make today count.", ""],
+        ["Doubt kills more dreams than failure ever will.", ""],
+        ["Work hard in silence. Let success make the noise.", ""],
+        ["If it was easy, everyone would do it.", ""],
+        ["Start where you are. Use what you have. Do what you can.", ""],
+        ["Every day is a new chance to get better.", ""],
+        ["Don't wish for it. Work for it.", ""],
+        ["Be so good that they can't ignore you.", ""],
+        ["Where there is a will, there is a way.", ""],
+        ["Practice makes progress.", ""],
+        ["Winners keep trying after everyone else has quit.", ""],
+        ["One more page, one more problem, one more step.", ""],
+        ["Hard work beats talent when talent doesn't work hard.", ""],
+        ["Believe in yourself and keep going.", ""],
+        ["A clear mind starts with a clean plan.", ""],
+        ["Stay patient. Good things take time.", ""],
+        ["You are one revision away from clarity.", ""]
+    ];
+    const quoteOfDay = () => QUOTES[Math.floor((Date.now() + 198e5) / 864e5) % QUOTES.length];
     const DRAWER_LINES = ['Small steps every day add up.', 'Consistency beats cramming.', 'Plan the day. Own the day.', "Today's effort is tomorrow's result.", 'Learn a little. Revise a little. Repeat.', 'Focus now, relax later.', 'Progress, not perfection.', 'Attend. Learn. Repeat.', 'Your future self is watching. Make them proud.', 'One class at a time.'];
     const drawerLine = () => DRAWER_LINES[Math.floor(Date.now() / 864e5) % DRAWER_LINES.length];
     function renderDrawer() {
