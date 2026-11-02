@@ -576,6 +576,8 @@
             else if (k === 'install') installApp();
             else if (k === 'about') openDev();
             else go(k);
+            const pg = $('.page.on'), tl = $('.page.on .tool.on');
+            [pg, tl].forEach(el => { if (el) { el.classList.add('slide'); el.addEventListener('animationend', () => el.classList.remove('slide'), { once: true }); } });
         }, 200);
     }
 
@@ -683,6 +685,7 @@
         if (!PAGES.includes(p)) p = 'home';
         current = p;
         closeSheet();
+        $$('.slide').forEach(el => el.classList.remove('slide'));
         $$('.page').forEach(el => el.classList.toggle('on', el.dataset.page === p));
         $$('.dock a').forEach(a => a.classList.toggle('on', a.dataset.nav === (NAV_OF[p] || p)));
         document.body.dataset.view = p;
