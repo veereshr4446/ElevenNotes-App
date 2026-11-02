@@ -516,6 +516,65 @@
             <button class="fab" data-act="add-task"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add task</button>`;
     };
 
+    // ---------- side menu ----------
+    const MENU_ICONS = {
+        home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+        book: '<path d="M3 5h7a3 3 0 0 1 2 1v14a3 3 0 0 0-2-1H3z"/><path d="M21 5h-7a3 3 0 0 0-2 1v14a3 3 0 0 1 2-1h7z"/>',
+        clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+        note: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+        check: '<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 12l3 3 5-6"/>',
+        calc: '<rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01"/>',
+        pct: '<path d="M19 5L5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/>',
+        hourglass: '<path d="M6 3h12M6 21h12M7 3v4l5 5-5 5v4M17 3v4l-5 5 5 5v4"/>',
+        timer: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/>',
+        user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+        gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
+        chat: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',
+        install: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+        code: '<path d="M8 8l-5 4 5 4M16 8l5 4-5 4M14 4l-4 16"/>'
+    };
+    function menuItems() {
+        const t = ui.studyTab;
+        return [
+            ['Main', [['home', 'Home', 'home', current === 'home']]],
+            ['Study', [['study:subjects', 'Subjects', 'book', current === 'study' && t === 'subjects'], ['study:timetable', 'Timetable', 'clock', current === 'study' && t === 'timetable'], ['study:library', 'Notes library', 'note', current === 'study' && t === 'library']]],
+            ['Plan', [['plan', 'Tasks and planner', 'check', current === 'plan']]],
+            ['Tools', [['tool:sgpa', 'SGPA calculator', 'calc', false], ['tool:att', 'Attendance tracker', 'pct', false], ['tool:count', 'Exam countdown', 'hourglass', false], ['tool:focus', 'Focus timer', 'timer', false]]],
+            ['Me', [['me', 'Profile', 'user', current === 'me'], ['settings', 'Settings', 'gear', false]]],
+            ['Help', [['feedback', 'Send feedback', 'chat', false]].concat(isStandalone() ? [] : [['install', 'Install app', 'install', false]]).concat([['about', 'About the developer', 'code', false]])]
+        ];
+    }
+    const DRAWER_LINES = ['Small steps every day add up.', 'Consistency beats cramming.', 'Plan the day. Own the day.', "Today's effort is tomorrow's result.", 'Learn a little. Revise a little. Repeat.', 'Focus now, relax later.', 'Progress, not perfection.', 'Attend. Learn. Repeat.', 'Your future self is watching. Make them proud.', 'One class at a time.'];
+    const drawerLine = () => DRAWER_LINES[Math.floor(Date.now() / 864e5) % DRAWER_LINES.length];
+    function renderDrawer() {
+        const p = S.profile;
+        $('#drawer').innerHTML = `<div class="drawer-head"><span class="drawer-title"><img src="images/logo.svg" alt="" width="30" height="30" />ElevenNotes</span><button class="icon-btn" data-act="menu-close" id="menuClose" aria-label="Close menu"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+            <button class="drawer-me" data-do="me" data-act="menu-go"><img src="${esc(p.avatar)}" alt="" /><span class="grow"><b>${esc(p.name)}</b><span>${esc(clsLabel())}</span></span></button>
+            <nav class="drawer-nav" aria-label="Menu">${menuItems().map(([title, items]) => `<div class="drawer-sec">${title}</div>${items.map(([k, label, ic, on]) => `<button class="drawer-item ${on ? 'on' : ''}" data-act="menu-go" data-do="${k}" ${on ? 'aria-current="page"' : ''}><svg class="i" viewBox="0 0 24 24">${MENU_ICONS[ic]}</svg><span>${label}</span></button>`).join('')}`).join('')}</nav>
+            <p class="drawer-foot">${esc(drawerLine())}</p>`;
+    }
+    function openMenu() {
+        renderDrawer();
+        const w = $('#drawerWrap'); w.classList.add('open'); w.setAttribute('aria-hidden', 'false'); document.body.classList.add('lock');
+        setTimeout(() => { const c = $('#menuClose'); if (c) c.focus(); }, 60);
+    }
+    function closeMenu(restoreFocus) {
+        const w = $('#drawerWrap'); if (!w.classList.contains('open')) return;
+        w.classList.remove('open'); w.setAttribute('aria-hidden', 'true');
+        if (!$('#devWrap').classList.contains('open')) document.body.classList.remove('lock');
+        if (restoreFocus) { const b = $('#menuBtn'); if (b) b.focus(); }
+    }
+    function menuGo(k) {
+        closeMenu(false);
+        if (k.indexOf('study:') === 0) { ui.studyTab = k.slice(6); go('study'); }
+        else if (k.indexOf('tool:') === 0) { go('tools'); showTool(k.slice(5)); }
+        else if (k === 'settings') settingsSheet();
+        else if (k === 'feedback') feedbackSheet();
+        else if (k === 'install') installApp();
+        else if (k === 'about') openDev();
+        else go(k);
+    }
+
     // ---------- ME ----------
     // ---------- install as app ----------
     let installEvt = null;
@@ -943,6 +1002,9 @@
             const sw = $('#sheetBody .switch'); if (sw) sw.classList.toggle('on', next === 'dark');
         },
         settings: settingsSheet,
+        menu: openMenu,
+        'menu-close'() { closeMenu(true); },
+        'menu-go'(t) { menuGo(t.dataset.do); },
         install: installApp,
         'install-dismiss'() { set('installDismiss', true); renderCurrent(); },
         'about-dev'() { closeSheet(); openDev(); },
@@ -1112,7 +1174,7 @@
         else if (e.target.id === 'libBranch') { ui.fBranch = e.target.value; renderCurrent(); }
         else if (e.target.id === 'libSem') { ui.fSem = e.target.value; renderCurrent(); }
     });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSheet(); closeDev(); } });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSheet(); closeDev(); closeMenu(true); } });
     window.addEventListener('hashchange', () => { if (location.hash !== routedHash) route(); });
 
     // ============================================================
