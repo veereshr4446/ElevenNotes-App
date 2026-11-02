@@ -10,7 +10,7 @@ Created by Viresh R. (RYMEC Ballari). The idea, design decisions, timetable data
 - **Class picker:** choose your branch and semester. Subjects, timetable and faculty follow your class. Search (top bar) finds subjects, notes, tasks, tools and classes.
 - **Home:** a "Today" sheet with your classes (current class marked Now, the next one marked Up next), pending tasks, exam countdown and quick links.
 - **Study:** subjects, a day-by-day timetable, and shared notes.
-- **Notes:** upload Google Drive links with a typed subject name, branch and semester. Filter by branch (CSE – A, CSE – B, CSE – AI & ML, CSE – Data Science & Cyber, ISE, ECE, EEE, Mechanical, Civil) and semester, search them, like the useful ones (most liked first), report bad ones. Each upload gets a 6-digit PIN, and only that PIN can delete it.
+- **Notes:** upload Google Drive links with a typed subject name, branch and semester. Filter by branch (CSE – A, CSE – B, CSE – AI & ML, CSE – Data Science & Cyber, ISE, ECE, EEE, Mechanical, Civil) and semester, search them, like the useful ones (most liked first), report bad ones. The uploader sets a password (6 to 30 characters), and only that password can edit or delete the note.
 - **Plan:** tasks with subject, priority and due date.
 - **Tools:** SGPA calculator (VTU grade scale), attendance planner, exam countdown with your own dates, focus timer.
 - **Profile:** name, USN, bio and picture, day streak and stats, today's goals, pending tasks, and a Settings button (class, dark mode, feedback, install, about, reset).
@@ -25,7 +25,7 @@ Created by Viresh R. (RYMEC Ballari). The idea, design decisions, timetable data
 
 ## Privacy
 - Your tasks, profile, class choice and settings are saved only in your own browser (LocalStorage). They are never sent anywhere.
-- Only two things go to the online database (Supabase): notes you choose to share (title, subject, Drive link, the name you type, and a hashed delete PIN), and a random anonymous device ID used for likes and a private daily usage count. No logins, emails or personal data are collected.
+- Only two things go to the online database (Supabase): notes you choose to share (title, subject, Drive link, the name you type, and a hashed password), and a random anonymous device ID used for likes and a private daily usage count. No logins, emails or personal data are collected.
 - ElevenNotes is not connected to any college system or third-party portal and does not read attendance or marks.
 - Timetables are added class by class from the official college timetables. Always check your official college timetable too.
 
@@ -36,10 +36,13 @@ Created by Viresh R. (RYMEC Ballari). The idea, design decisions, timetable data
    - `supabase/upvotes.sql` (likes)
    - `supabase/stats.sql` (private usage count)
    - `supabase/filters.sql` (branch and semester filters for notes)
+   - `supabase/admin.sql` (owner delete code)
+   - `supabase/password.sql` (note passwords and editing)
+   - `supabase/types.sql` (note types: notes, question papers, lab manuals, assignments)
 3. Open **Project Settings > API**, copy the Project URL and the anon / publishable key into `js/config.js`.
 4. Commit and push. Done.
 
-How it stays safe: the tables are locked, the website can only call a few approved functions, the PIN is stored only as a bcrypt hash, 5 wrong PINs lock that note for 15 minutes, only Google Drive/Docs links are accepted, and notes with 5 reports are hidden. The usage numbers can only be read by the owner in the Supabase SQL Editor with `select get_stats();`.
+How it stays safe: the tables are locked, the website can only call a few approved functions, the password is stored only as a bcrypt hash, 5 wrong passwords lock that note for 15 minutes, only Google Drive/Docs links are accepted, and notes with 5 reports are hidden. The usage numbers can only be read by the owner in the Supabase SQL Editor with `select get_stats();`.
 
 ## Add a class timetable
 Add an entry to `CLASS_DATA` in `js/data.js`, keyed as `BRANCH|SEMESTER` (for example `CSE-A|3`), with its subjects, faculty and timetable.
