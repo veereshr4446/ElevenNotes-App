@@ -363,8 +363,9 @@
 
     function libAddSheet(subject) {
         const ub = fBranch() === 'all' ? myGroup() : fBranch(), us = fSem() === 'all' ? String(CLS.sem) : fSem();
+        const seen = get('guideSeen', false); set('guideSeen', true);
         openSheet('Upload notes', `<form data-form="share">
-            <details class="howto" open><summary>How to get the Drive link</summary>
+            <details class="howto" ${seen ? '' : 'open'}><summary><span>How to upload</span><em></em></summary>
                 <ol>
                     <li>Open your PDF in <b>Google Drive</b> and tap the <b>three dots</b> next to it.</li>
                     <li>Tap <b>Manage access</b>.</li>
