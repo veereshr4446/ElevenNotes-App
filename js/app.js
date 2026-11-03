@@ -364,6 +364,17 @@
     function libAddSheet(subject) {
         const ub = fBranch() === 'all' ? myGroup() : fBranch(), us = fSem() === 'all' ? String(CLS.sem) : fSem();
         openSheet('Upload notes', `<form data-form="share">
+            <details class="howto" open><summary>How to get the Drive link</summary>
+                <ol>
+                    <li>Open your PDF in <b>Google Drive</b> and tap the <b>three dots</b> next to it.</li>
+                    <li>Tap <b>Manage access</b>.</li>
+                    <li>Under <b>General access</b>, tap <b>Change</b>.</li>
+                    <li>Select <b>Anyone with the link</b> and tap <b>Save</b>.</li>
+                    <li>Tap <b>Copy link</b> and paste it below.</li>
+                </ol>
+                <a href="images/drive-link-guide.jpg" target="_blank" rel="noopener"><img class="howto-img" src="images/drive-link-guide.jpg" alt="Step by step pictures: open the three dots, Manage access, Change, Anyone with the link, Save, Copy link" loading="lazy" /></a>
+                <p>Tap the picture to see it full size. If this is skipped, other students will see "You need access" and cannot open your notes.</p>
+            </details>
             <div class="two-col">
                 <label>Branch<select name="branch">${NOTE_BRANCHES.map(b => `<option value="${b.id}" ${ub === b.id ? 'selected' : ''}>${b.name}</option>`).join('')}</select></label>
                 <label>Semester<select name="sem">${SEMESTERS.map(n => `<option value="${n}" ${us === String(n) ? 'selected' : ''}>Semester ${n}</option>`).join('')}</select></label>
@@ -371,7 +382,7 @@
             <label>Type<select name="kind">${NOTE_TYPES.map(([v, t]) => `<option value="${v}" ${v === (ui.fKind !== 'all' ? ui.fKind : 'Notes') ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
             <label>Subject name<input name="subject" maxlength="20" required value="${esc(subject || '')}" placeholder="e.g. DSA, Maths, Java" autocapitalize="words" /></label>
             <label>Title<input name="title" maxlength="80" required placeholder="e.g. Unit 3 notes or 2023 question paper" /></label>
-            <label>Google Drive link<input type="url" name="url" required placeholder="https://drive.google.com/..." /></label>
+            <label>Google Drive link <span class="opt">(set to Anyone with the link)</span><input type="url" name="url" required placeholder="https://drive.google.com/..." /></label>
             <label>Your name <span class="opt">(shown to others)</span><input name="uploader" maxlength="30" value="${esc(S.profile.name)}" /></label>
             <label>Password <span class="opt">(6 to 30 characters, you need it to edit or delete)</span>
                 <span class="pin-row"><input type="password" name="pin" minlength="6" maxlength="30" required placeholder="Choose a password" autocomplete="new-password" /><button type="button" class="btn ghost small" data-act="pin-show">Show</button></span></label>
@@ -420,7 +431,7 @@
         openSheet('Edit details', `<form data-form="edit-note"><input type="hidden" name="id" value="${esc(id)}" />
             <label>Subject name<input name="subject" maxlength="20" required value="${esc(it.subject)}" autocapitalize="words" /></label>
             <label>Title<input name="title" maxlength="80" required value="${esc(it.title)}" /></label>
-            <label>Google Drive link<input type="url" name="url" required value="${esc(it.url)}" /></label>
+            <label>Google Drive link <span class="opt">(set to Anyone with the link)</span><input type="url" name="url" required value="${esc(it.url)}" /></label>
             <label>Your password <span class="opt">(older notes: the 6-digit PIN)</span><input type="password" name="pin" maxlength="64" required placeholder="Password" autocomplete="off" /></label>
             <button class="btn primary block" type="submit">Save changes</button></form>`);
     }
