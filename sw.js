@@ -1,5 +1,5 @@
 /* ElevenNotes service worker: lets the app open offline. Live data (Supabase) and music are never cached. */
-const CACHE = 'elevennotes-v2';
+const CACHE = 'elevennotes-v3';
 const ASSETS = ['./', 'index.html', 'css/style.css', 'js/config.js', 'js/data.js', 'js/app.js', 'manifest.json', 'images/logo.svg', 'images/profile.jpg', 'images/drive-link-guide.jpg',
     'images/icon-192.png', 'images/icon-512.png', 'images/avatar-boy-1.jpeg', 'images/avatar-boy-2.jpeg', 'images/avatar-boy-3.jpeg',
     'images/avatar-girl-1.jpeg', 'images/avatar-girl-2.jpeg', 'images/avatar-girl-3.jpeg'];
