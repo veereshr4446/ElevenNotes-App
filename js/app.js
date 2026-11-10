@@ -544,6 +544,7 @@
         gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
         chat: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',
         install: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+        heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
         code: '<path d="M8 8l-5 4 5 4M16 8l5 4-5 4M14 4l-4 16"/>'
     };
     function menuItems() {
@@ -553,6 +554,7 @@
             ['Study', [['study:subjects', 'Subjects', 'book', current === 'study' && t === 'subjects'], ['study:timetable', 'Timetable', 'clock', current === 'study' && t === 'timetable'], ['study:library', 'Notes library', 'note', current === 'study' && t === 'library']]],
             ['Plan', [['plan', 'Tasks and planner', 'check', current === 'plan']]],
             ['Tools', [['tool:sgpa', 'SGPA calculator', 'calc', false], ['tool:att', 'Attendance tracker', 'pct', false], ['tool:count', 'Exam countdown', 'hourglass', false], ['tool:focus', 'Focus timer', 'timer', false]]],
+            ['Health', [['lucy', 'Ask Lucy: health tips', 'heart', false]]],
             ['Me', [['me', 'Profile', 'user', current === 'me'], ['settings', 'Settings', 'gear', false]]],
             ['Help', [['feedback', 'Send feedback', 'chat', false]].concat(isStandalone() ? [] : [['install', 'Install app', 'install', false]]).concat([['about', 'About the developer', 'code', false]])]
         ];
@@ -642,6 +644,12 @@
         if (restoreFocus) { const b = $('#menuBtn'); if (b) b.focus(); }
     }
     function menuGo(k) {
+        if (k === 'lucy') {
+            // open straight away (inside the tap) so phones don't block the new tab
+            const w0 = $('#drawerWrap'); w0.classList.remove('open'); w0.setAttribute('aria-hidden', 'true'); document.body.classList.remove('lock');
+            window.open('https://nurify-lucy.vercel.app/', '_blank', 'noopener');
+            return;
+        }
         // let the menu finish sliding out before the page changes, so neither animation stutters
         const w = $('#drawerWrap'); w.classList.remove('open'); w.setAttribute('aria-hidden', 'true');
         setTimeout(() => {
